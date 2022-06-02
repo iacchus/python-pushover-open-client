@@ -174,12 +174,8 @@ class PushoverOpenClient:
 
         Args:
             email (`str`): The Pushover account's email with which login.
-                Defaults to `None`, so to get `email` from the
-                configuration file.
-            password (`str`): The Pushover account's password with
-                which to login.
-                Defaults to `None`, so to get `password` from the
-                configuration file.
+            password (`str`): The Pushover account's password with which
+                to login.
 
         Returns:
             An instance of this class.
@@ -187,13 +183,22 @@ class PushoverOpenClient:
 
         self.email = email
         self.password = password
-        self.write_credentials_file()
+        self.write_credentials_file()  # TODO: check if the file exists
         self.load_from_credentials_file()
 
         return self
 
     def load_from_credentials_file(self, file_path: str =\
                                    CREDENTIALS_FILENAME) -> Self:
+        """Loads class through credentials file.
+
+        Args:
+            file_path (str, optional): Loads from this file path; if not
+                provided, loads from the default configurations file.
+
+        Returns: An instance of this class.
+
+        """
 
         if not os.path.isfile(file_path):
             raise Exception("Credentials file '{credentials_file_path}'"
@@ -218,10 +223,29 @@ class PushoverOpenClient:
 
     def login(self, email: str = None, password: str = None, twofa: str = None,
               rewrite_creds_file: bool = True) -> str | bool:
-        """
-        Logs in with email and password, achieving a `secret` from the API.
+        """Executes login, acquiring a `secret`.
 
-        As specified in https://pushover.net/api/client#login
+        If `email` or `account` are not given, this method will use those
+        loaded in the class, `self.email` and `self.password`.
+
+        In the case of the account being set up to use two-factor
+        authentication, the first login attempt will fail, with this method
+        setting `self.needs_twofa` to `True` and returning `False`; the token
+        then should be set directly at the `self.twofa`(str) or through
+        the `self.set_twofa(twofa: str)` method, and then this method
+        `self.login` should be executed again to achieve the `secret`.
+
+        Args:
+            email (:obj:`str`, optional): The Pushover account's email.
+            password (:obj:`str`, optional): The Pushover account's password.
+            twofa (:obj:`str`, optional): The two-factor authentication token.
+            rewrite_creds_file (bool): Wether the credentials file should be
+                rewritten containing the new acquired `secret` (True) or
+                not (False).
+
+        Returns:
+            The new acquired `secret` (stored in `self.secret`) if the login is
+                successful, `False` otherwise.
         """
 
         if not email:
