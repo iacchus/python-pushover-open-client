@@ -9,7 +9,7 @@ import json
 import os
 import requests
 import sys
-from typing import Callable
+from typing import Callable, Self
 
 import websocket
 
@@ -123,22 +123,22 @@ class PushoverOpenClient:
     login_errors: list[str] | dict[list] = None
 
     device_registration_response: requests.Response = None
-    device_registration_response_data = dict()
-    device_registration_errors = None
+    device_registration_response_data: dict = dict()
+    device_registration_errors: list[str] | dict[list] = None
 
-    message_downloading_response = None  # requests.Response
-    message_downloading_response_data = dict()
-    message_downloading_errors = None
+    message_downloading_response: requests.Response = None
+    message_downloading_response_data: dict = dict()
+    message_downloading_errors: list[str]  | dict[list] = None
 
-    update_highest_message_response = None  # requests.Response
-    update_highest_message_response_data = dict()
-    update_highest_message_errors = None
+    update_highest_message_response: requests.Response = None
+    update_highest_message_response_data: dict = dict()
+    update_highest_message_errors: list[str] | dict[list] = None
 
-    def __init__(self, email=None, password=None):
+    def __init__(self, email: str = None, password: str = None) -> None:
         if not email or not password:
             self.load_from_credentials_file()
 
-    def load_from_email_and_password(self, email, password):
+    def load_from_email_and_password(self, email: str, password: str) -> Self:
 
         self.email = email
         self.password = password
@@ -147,7 +147,8 @@ class PushoverOpenClient:
 
         return self
 
-    def load_from_credentials_file(self, file_path=CREDENTIALS_FILENAME):
+    def load_from_credentials_file(self, file_path: str =\
+                                   CREDENTIALS_FILENAME) -> Self:
 
         if not os.path.isfile(file_path):
             raise Exception("Credentials file '{credentials_file_path}'"
@@ -170,8 +171,8 @@ class PushoverOpenClient:
 
         return self
 
-    def login(self, email=None, password=None, twofa=None,
-              rewrite_creds_file=True):
+    def login(self, email: str = None, password: str = None, twofa: str = None,
+              rewrite_creds_file: bool = True) -> str | bool:
         """
         Logs in with email and password, achieving a `secret` from the API.
 
@@ -224,7 +225,7 @@ class PushoverOpenClient:
 
         return self.secret
 
-    def set_twofa(self, twofa):
+    def set_twofa(self, twofa: str) -> None:
         """
         Sets the code for two-factor authentication,
         if the user has it enabled. After this, `self.login()` should be
@@ -232,8 +233,8 @@ class PushoverOpenClient:
         """
         self.twofa = twofa
 
-    def register_device(self, device_name=None,
-                        secret=None, rewrite_creds_file=True):
+    def register_device(self, device_name: str = None, secret: str = None,
+                        rewrite_creds_file: bool = True) -> str | bool:
         """
         Registers a new client device on the Pushover account.
 
@@ -266,7 +267,7 @@ class PushoverOpenClient:
         if not device_registration_response_dict["status"] == 1:
             self.device_registration_errors =\
                 device_registration_response_dict["errors"]
-            return None
+            return False
 
         # else...
         self.device_id = device_registration_response_dict["id"]
@@ -276,7 +277,8 @@ class PushoverOpenClient:
 
         return self.device_id
 
-    def download_messages(self, secret=None, device_id=None):
+    # TODO: find the return type, if list or dict, for this method
+    def download_messages(self, secret: str = None, device_id: str = None):
         """
         Downloads all messages currently on this device.
 
@@ -319,8 +321,9 @@ class PushoverOpenClient:
 
         return messages
 
-    def delete_all_messages(self, device_id=None, secret=None,
-                            last_message_id=None):
+    # TODO: check the real type of last message id
+    def delete_all_messages(self, device_id: str = None, secret: str = None,
+                            last_message_id: int | str = None) -> bool:
         """
         Deletes all messages for this device. If not deleted, tey keep
         being downloaded again.
@@ -367,7 +370,7 @@ class PushoverOpenClient:
         # else...
         return True
 
-    def get_highest_message_id(self, redownload=False):
+    def get_highest_message_id(self, redownload: bool = False) -> int:
 
         if redownload:
             self.download_messages()
@@ -381,7 +384,8 @@ class PushoverOpenClient:
 
         return self.highest_message_id
 
-    def write_credentials_file(self, file_path=None):
+    # TODO: Make error testing here and change the return value to 'bool'
+    def write_credentials_file(self, file_path: str = None) -> None:
 
         if not file_path:
             file_path = self.credentials_filename
@@ -391,7 +395,8 @@ class PushoverOpenClient:
         with open(file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent=2)
 
-    def get_websocket_login_string(self, device_id=None, secret=None):
+    def get_websocket_login_string(self, device_id: str = None,
+                                   secret: str = None) -> str:
 
         if not device_id:
             device_id = self.device_id
@@ -407,10 +412,10 @@ class PushoverOpenClient:
 
         return websocket_login_string
 
-    def set_twofa(self, twofa):
+    def set_twofa(self, twofa: str) -> None:
         self.twofa = twofa
 
-    def _get_credentials_dict(self):
+    def _get_credentials_dict(self) -> dict:
         credentials_dict = dict()
 
         if self.email: credentials_dict.update({"email": self.email})
@@ -421,7 +426,8 @@ class PushoverOpenClient:
 
         return credentials_dict
 
-    def _get_login_payload(self, email, password, twofa):
+    def _get_login_payload(self, email: str, password: str,
+                           twofa: str) -> dict:
         login_payload = {
             "email": email,
             "password": password
@@ -432,7 +438,8 @@ class PushoverOpenClient:
 
         return login_payload
 
-    def _get_device_registration_payload(self, device_name, secret):
+    def _get_device_registration_payload(self, device_name: str,
+                                         secret: str) -> dict:
 
         device_registration_payload = {
             "name": device_name,
@@ -442,7 +449,8 @@ class PushoverOpenClient:
 
         return device_registration_payload
 
-    def _get_message_downloading_params(self, secret, device_id):
+    def _get_message_downloading_params(self, secret: str,
+                                        device_id: str) -> dict:
 
         message_downloading_params = {
             "secret": secret,
@@ -451,7 +459,7 @@ class PushoverOpenClient:
 
         return message_downloading_params
 
-    def _get_delete_messages_payload(self, message, secret):
+    def _get_delete_messages_payload(self, message: str, secret: str) -> dict:
 
         delete_messages_payload = {
             "message": message,
