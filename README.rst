@@ -37,8 +37,7 @@ python-pushover-open-client
     Command line app and framework for receiving Pushover push notifications in real time
 
 
-Soon a longer desc here..
-
+Soon...
 
 .. _pyscaffold-notes:
 
