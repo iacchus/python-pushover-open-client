@@ -12,6 +12,7 @@ import sys
 
 import websocket
 
+
 if sys.version_info[:2] >= (3, 8):
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
     from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
@@ -113,7 +114,6 @@ class PushoverOpenClient:
     device_registration_response_data = dict()
     device_registration_errors = None
 
-
     message_downloading_response = None  # requests.Response
     message_downloading_response_data = dict()
     message_downloading_errors = None
@@ -122,9 +122,9 @@ class PushoverOpenClient:
     update_highest_message_response_data = dict()
     update_highest_message_errors = None
 
-    def __init__(self):
-        #self.load_from_credentials_file()
-        pass
+    def __init__(self, email=None, password=None):
+        if not email or not password:
+            self.load_from_credentials_file()
 
     def load_from_credentials_file(self, file_path=CREDENTIALS_FILENAME):
 
@@ -370,9 +370,20 @@ class PushoverOpenClient:
         with open(file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent=2)
 
-    def get_websocket_login_string(self):
+    def get_websocket_login_string(self, device_id=None, secret=None):
+
+        if not device_id:
+            device_id = self.device_id
+
+        if not secret:
+            secret = self.secret
+
+        if not device_id or not secret:
+            raise Exception("Credentials are not loaded.")
+
         websocket_login_string = PUSHOVER_WEBSOCKET_LOGIN \
             .format(device_id=self.device_id, secret=self.secret)
+
         return websocket_login_string
 
     def set_twofa(self, twofa):
@@ -463,7 +474,9 @@ class PushoverOpenClientRealTime:
         pass
 
     def message_do_sync(self):
-        pass
+        messages = self.pushover_open_client.download_messages()
+        self.pushover_open_client.delete_all_messages()
+        print(messages)  # TODO: fixme!!
 
     def message_reload_request(self):
         pass
@@ -491,6 +504,7 @@ class PushoverOpenClientRealTime:
     def _on_message(self, websocketapp, message):
         if message in self.pushover_websocket_server_commands:
             self.pushover_websocket_server_commands[message]()
+            print("HEY")
 
         print(message, PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING[message])
 
