@@ -113,6 +113,15 @@ class PushoverOpenClient:
     secret:str = str()
 
     twofa: str = None  # two-factor authentication
+    """str: Two-factor authentication code.
+    
+    This should contain the two-factor authentication code if the account is
+    set up to use it. The Pushover server will send HTTP status code 412 when
+    logging in with only email and password if `self.twofa` is not set and the
+    account requires it.
+    After setting the code in `self.twofa`, the login attempt should be made
+    again.
+    """
 
     needs_twofa: bool = False
 
@@ -135,10 +144,46 @@ class PushoverOpenClient:
     update_highest_message_errors: list[str] | dict[list] = None
 
     def __init__(self, email: str = None, password: str = None) -> None:
+        """Initializes the class, loading the basic credentials.
+
+        The init method of this class loads at least the bare minimum
+        credentials to connect to the Pushover server. If `email` or `password`
+        are not provided, the class will attempt to read the default
+        configuration file.
+
+        Args:
+            email (:obj:`str`, optional): The Pushover account's email with
+                which to login. Defaults to `None`, so to get `email` from the
+                configuration file.
+            password (:obj:`str`, optional): The Pushover account's password
+                with which login. Defaults to `None`, so to get `password` from
+                the configuration file.
+
+        Todo:
+            * Improve the logic of these functions, together with the means of
+                logging in.
+        """
         if not email or not password:
             self.load_from_credentials_file()
 
     def load_from_email_and_password(self, email: str, password: str) -> Self:
+        """Sets the credentials preparing the class for `self.login`.
+
+        Receives thethe bare minimum credentials needed to connect to the
+        Pushover server.
+
+        Args:
+            email (`str`): The Pushover account's email with which login.
+                Defaults to `None`, so to get `email` from the
+                configuration file.
+            password (`str`): The Pushover account's password with
+                which to login.
+                Defaults to `None`, so to get `password` from the
+                configuration file.
+
+        Returns:
+            An instance of this class.
+        """
 
         self.email = email
         self.password = password
