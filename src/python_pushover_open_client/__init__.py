@@ -244,8 +244,8 @@ class PushoverOpenClient:
                 not (False).
 
         Returns:
-            The new acquired `secret` (stored in `self.secret`) if the login is
-                successful, `False` otherwise.
+            str | bool: The new acquired `secret` (stored in `self.secret`)
+            if the login is successful, `False` otherwise.
         """
 
         if not email:
@@ -295,11 +295,15 @@ class PushoverOpenClient:
         return self.secret
 
     def set_twofa(self, twofa: str) -> None:
+        """Sets the two-factor authentication token.
+
+        Args:
+            twofa (str): The two-factor authentication token.
+
+        Returns:
+            None
         """
-        Sets the code for two-factor authentication,
-        if the user has it enabled. After this, `self.login()` should be
-        executed again.
-        """
+
         self.twofa = twofa
 
     def register_device(self, device_name: str = None, secret: str = None,
@@ -308,6 +312,15 @@ class PushoverOpenClient:
         Registers a new client device on the Pushover account.
 
         As specified in https://pushover.net/api/client#register
+
+        Args:
+            device_name (str, optional):
+            secret (ste, optional):
+            rewrite_creds_file (bool):
+
+        Returns:
+            str | bool: The new `device_id` (stored in `self.device_id`) in the
+            case of success; `False` otherwise.
         """
 
         if not device_name:
@@ -348,10 +361,16 @@ class PushoverOpenClient:
 
     # TODO: find the return type, if list or dict, for this method
     def download_messages(self, secret: str = None, device_id: str = None):
-        """
-        Downloads all messages currently on this device.
+        """Downloads all messages currently on this device.
 
         As specified in https://pushover.net/api/client#download
+
+        Args:
+            secret (str, optional):
+            device_id (str, optional):
+
+        Returns:
+
         """
 
         if not secret:
@@ -393,11 +412,18 @@ class PushoverOpenClient:
     # TODO: check the real type of `last_message_id`
     def delete_all_messages(self, device_id: str = None, secret: str = None,
                             last_message_id: int | str = None) -> bool:
-        """
-        Deletes all messages for this device. If not deleted, tey keep
+        """Deletes all messages for this device. If not deleted, tey keep
         being downloaded again.
-        
+
         As specified in https://pushover.net/api/client#delete
+
+        Args:
+            device_id (str, optional):
+            secret (str, optional):
+            last_message_id (int | str, optional):
+
+        Returns:
+
         """
 
         if not device_id:
@@ -440,6 +466,14 @@ class PushoverOpenClient:
         return True
 
     def get_highest_message_id(self, redownload: bool = False) -> int:
+        """
+
+        Args:
+            redownload (bool):
+
+        Returns:
+
+        """
 
         if redownload:
             self.download_messages()
@@ -455,6 +489,14 @@ class PushoverOpenClient:
 
     # TODO: Make error testing here and change the return value to 'bool'
     def write_credentials_file(self, file_path: str = None) -> None:
+        """
+
+        Args:
+            file_path (str):
+
+        Returns:
+
+        """
 
         if not file_path:
             file_path = self.credentials_filename
@@ -480,9 +522,6 @@ class PushoverOpenClient:
             .format(device_id=self.device_id, secret=self.secret)
 
         return websocket_login_string
-
-    def set_twofa(self, twofa: str) -> None:
-        self.twofa = twofa
 
     def _get_credentials_dict(self) -> dict:
         credentials_dict = dict()
@@ -544,6 +583,15 @@ class PushoverOpenClientRealTime:
     def __init__(self, pushover_open_client: PushoverOpenClient = None,
                  pushover_websocket_server_url: str =
                  PUSHOVER_WEBSOCKET_SERVER_URL) -> None:
+        """Connects to the Pushover's websocket server to do stuff.
+
+         Opens a websocket connection with the Pushover's websocket server and
+         handles it's websocket commands.
+
+        Args:
+            pushover_open_client (PushoverOpenClient):
+            pushover_websocket_server_url (str, optional):
+        """
 
         if not pushover_open_client:
             pushover_open_client =\
@@ -570,9 +618,20 @@ class PushoverOpenClientRealTime:
                                    on_close=self._on_close)
 
     def message_keep_alive(self) -> None:
+        """
+
+        Returns:
+
+        """
         pass
 
     def message_do_sync(self) -> None:
+        """
+
+        Returns:
+
+        """
+
         messages = self.pushover_open_client.download_messages()
         self.pushover_open_client.delete_all_messages()
         print(messages)  # TODO: fixme!!
@@ -584,9 +643,21 @@ class PushoverOpenClientRealTime:
                 print("URL:    ", message["url"])
 
     def message_reload_request(self) -> None:
+        """
+
+        Returns:
+
+        """
+
         pass
 
     def message_error_permanent(self) -> None:
+        """
+
+        Returns:
+
+        """
+
         pushover_open_client = PushoverOpenClient()
         pushover_open_client.login()
         pushover_open_client.register_device()
@@ -596,13 +667,42 @@ class PushoverOpenClientRealTime:
         self.pushover_open_client = pushover_open_client
 
     def message_error(self) -> None:
+        """
+
+        Returns:
+
+        """
+
         pass
 
     def send_login(self, pushover_websocket_connection: websocket.WebSocketApp,
                    pushover_websocket_login_string: str) -> None:
+        """
+
+        Args:
+            pushover_websocket_connection (websocket.WebSocketApp):
+            pushover_websocket_login_string (str):
+
+        Returns:
+
+        """
+
+        if not pushover_websocket_connection:
+            pushover_websocket_connection = self.websocketapp
+
+        if not pushover_websocket_login_string:
+            pushover_websocket_login_string =\
+                self.pushover_websocket_login_string
+
         pushover_websocket_connection.send(pushover_websocket_login_string)
 
     def run_forever(self) -> None:
+        """
+
+        Returns:
+
+        """
+
         self.websocketapp.run_forever()
 
     def _on_open(self, websocketapp: websocket.WebSocketApp) -> None:
