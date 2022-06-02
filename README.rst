@@ -34,31 +34,46 @@ python-pushover-open-client
 ===========================
 
 
-    Add a short description here!
+    Command line app and framework for receiving Pushover push notifications in real time
 
 
-A longer description of your project goes here...
+Soon a longer desc here..
 
 
 .. _pyscaffold-notes:
 
-Making Changes & Contributing
-=============================
+How to test it for now
+======================
 
-This project uses `pre-commit`_, please make sure to install it before making any
-changes::
+The script expects a file at the home directory named ``~/.pushover-open-client-creds.json``. The file should be a JSON file with account's ``email`` and ``password``, this way:
 
-    pip install pre-commit
-    cd python-pushover-open-client
-    pre-commit install
+file: ``~/.pushover-open-client-creds.json``
+--------------------------------------------
 
-It is a good idea to update the hooks to the latest version::
+::
 
-    pre-commit autoupdate
+  {
+    "email": "USERS@EMAIL.ETC",
+    "password": "M4HSUP3RBPASS"
+  }
 
-Don't forget to tell your contributors to also install and use pre-commit.
+Given the above, by logging and getting an auth secret, a new device will be created wielding it's device_id, and that file will be updated containing all these four values
 
-.. _pre-commit: https://pre-commit.com/
+Contributing
+============
+
+Please open an issue if you want to contribute with code.
+
+
+Support
+=======
+
+You can open a issue or a message in discussions for support in using/getting the code.
+
+Is it ready already?
+====================
+
+No, not really, but will be soon. All steps of the app are already implemented, almost all is done.
 
 Note
 ====
