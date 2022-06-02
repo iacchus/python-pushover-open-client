@@ -9,10 +9,11 @@ import json
 import os
 import requests
 import sys
+from typing import Callable
 
 import websocket
 
-DEBUG = False
+DEBUG: bool = False
 
 if DEBUG:
     websocket.enableTrace(True)
@@ -32,20 +33,20 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-PUSHOVER_API_URL = "https://api.pushover.net/1"
+PUSHOVER_API_URL: str = "https://api.pushover.net/1"
 
-ENDPOINT_LOGIN = "{api_url}/users/login.json".format(api_url=PUSHOVER_API_URL)
-ENDPOINT_DEVICES = "{api_url}/devices.json".format(api_url=PUSHOVER_API_URL)
-ENDPOINT_MESSAGES = "{api_url}/messages.json".format(api_url=PUSHOVER_API_URL)
-ENDPOINT_UPDATE_HIGHEST_MESSAGE = \
+ENDPOINT_LOGIN: str = "{api_url}/users/login.json".format(api_url=PUSHOVER_API_URL)
+ENDPOINT_DEVICES: str = "{api_url}/devices.json".format(api_url=PUSHOVER_API_URL)
+ENDPOINT_MESSAGES : str= "{api_url}/messages.json".format(api_url=PUSHOVER_API_URL)
+ENDPOINT_UPDATE_HIGHEST_MESSAGE: str = \
         "{api_url}/devices/{device_id}/update_highest_message.json"
 
-PUSHOVER_WEBSOCKET_SERVER_URL = "wss://client.pushover.net/push"
-PUSHOVER_WEBSOCKET_LOGIN = "login:{device_id}:{secret}\n"
+PUSHOVER_WEBSOCKET_SERVER_URL: str = "wss://client.pushover.net/push"
+PUSHOVER_WEBSOCKET_LOGIN: str = "login:{device_id}:{secret}\n"
 
-CREDENTIALS_FILENAME = os.path.expanduser("~/.pushover-open-client-creds.json")
+CREDENTIALS_FILENAME: str = os.path.expanduser("~/.pushover-open-client-creds.json")
 
-PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING = {
+PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING: dict[bytes, str] = {
     b'#': "Keep-alive packet, no response needed.",
     b'!': "A new message has arrived; you should perform a sync.",
     b'R': "Reload request; you should drop your connection and re-connect.",
@@ -56,10 +57,11 @@ PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING = {
           "session is being closed. Do not automatically re-connect."
 }
 
-COMMAND_FUNCTIONS_REGISTRY = {}
-PARSING_FUNCTIONS_REGISTRY = {}
+COMMAND_FUNCTIONS_REGISTRY: dict[str, list] = {}
+PARSING_FUNCTIONS_REGISTRY: dict[str, dict] = {}
 
-def generate_new_device_name():
+
+def generate_new_device_name() -> str:
     # device name is up to 25 chars, [A-Za-z0-9_-]
 
     now = datetime.datetime.now()
@@ -68,7 +70,8 @@ def generate_new_device_name():
 
     return new_device_name
 
-def print_data_errors(errors):
+
+def print_data_errors(errors: list[str] | dict[str, list[str]]) -> None:
     # errors can be a list or a dict
     if isinstance(errors, list):
         for error in errors: print(error)
@@ -79,7 +82,9 @@ def print_data_errors(errors):
     else:  # this doesn't ever happen, only list or dict, but I'm unsure.
         print("ERROR:", errors)
 
-def register_command(f, *args, **kwargs):
+
+# TODO: improve decorators typing annotations
+def register_command(f: Callable, *args, **kwargs) -> Callable:
     """Decorator who register command functions.
 
     Commands execute user-defined functions. The name of the function is the
@@ -88,33 +93,36 @@ def register_command(f, *args, **kwargs):
     """
     pass
 
-def register_parser(f, *args, **kwargs):
+
+# TODO: improve decorators typing annotations
+def register_parser(f: Callable, *args, **kwargs) -> Callable:
     """Decorator who register perser functions.
 
     Parser functions receive raw data received from each notification from the
     pushover server, and parses it."""
     pass
 
+
 class PushoverOpenClient:
 
     credentials_filename = CREDENTIALS_FILENAME
 
-    email = str()
-    password = str()
-    device_id = str()
-    secret = str()
+    email: str = str()
+    password: str = str()
+    device_id:str = str()
+    secret:str = str()
 
     twofa: str = None  # two-factor authentication
 
-    needs_twofa = False
+    needs_twofa: bool = False
 
-    messages = dict()  # { message_id: {message_dict...}, }
+    messages: dict[int, dict] = dict()  # { message_id: {message_dict...}, }
 
-    login_response = None  # requests.Response
+    login_response: requests.Response = None
     login_response_data = dict()
-    login_errors = None
+    login_errors: list[str] | dict[list] = None
 
-    device_registration_response = None  # requests.Response
+    device_registration_response: requests.Response = None
     device_registration_response_data = dict()
     device_registration_errors = None
 
