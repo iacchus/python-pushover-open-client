@@ -12,6 +12,10 @@ import sys
 
 import websocket
 
+DEBUG = False
+
+if DEBUG:
+    websocket.enableTrace(True)
 
 if sys.version_info[:2] >= (3, 8):
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
@@ -125,6 +129,15 @@ class PushoverOpenClient:
     def __init__(self, email=None, password=None):
         if not email or not password:
             self.load_from_credentials_file()
+
+    def load_from_email_and_password(self, email, password):
+
+        self.email = email
+        self.password = password
+        self.write_credentials_file()
+        self.load_from_credentials_file()
+
+        return self
 
     def load_from_credentials_file(self, file_path=CREDENTIALS_FILENAME):
 
@@ -477,12 +490,24 @@ class PushoverOpenClientRealTime:
         messages = self.pushover_open_client.download_messages()
         self.pushover_open_client.delete_all_messages()
         print(messages)  # TODO: fixme!!
+        for message in messages:
+            if "title" in message:
+                print("TITLE:  ", message["title"])
+            print("MESSAGE:", message["message"])
+            if "url" in message:
+                print("URL:    ", message["url"])
 
     def message_reload_request(self):
         pass
 
     def message_error_permanent(self):
-        pass
+        pushover_open_client = PushoverOpenClient()
+        pushover_open_client.login()
+        pushover_open_client.register_device()
+        pushover_open_client.download_messages()
+        pushover_open_client.delete_all_messages()
+
+        self.pushover_open_client = pushover_open_client
 
     def message_error(self):
         pass
@@ -504,9 +529,9 @@ class PushoverOpenClientRealTime:
     def _on_message(self, websocketapp, message):
         if message in self.pushover_websocket_server_commands:
             self.pushover_websocket_server_commands[message]()
-            print("HEY")
 
-        print(message, PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING[message])
+        if DEBUG:
+            print(message, PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING[message])
 
     def _on_error(self, websocketapp, exception):
         pass
