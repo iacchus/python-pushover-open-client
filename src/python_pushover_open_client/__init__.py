@@ -321,7 +321,7 @@ class PushoverOpenClient:
 
         return messages
 
-    # TODO: check the real type of last message id
+    # TODO: check the real type of `last_message_id`
     def delete_all_messages(self, device_id: str = None, secret: str = None,
                             last_message_id: int | str = None) -> bool:
         """
@@ -472,8 +472,9 @@ class PushoverOpenClientRealTime:
 
     pushover_websocket_server_commands = dict()
 
-    def __init__(self, pushover_open_client=None,
-                 pushover_websocket_server_url=PUSHOVER_WEBSOCKET_SERVER_URL):
+    def __init__(self, pushover_open_client: PushoverOpenClient = None,
+                 pushover_websocket_server_url: str =
+                 PUSHOVER_WEBSOCKET_SERVER_URL) -> None:
 
         if not pushover_open_client:
             pushover_open_client =\
@@ -499,10 +500,10 @@ class PushoverOpenClientRealTime:
                                    on_error=self._on_error,
                                    on_close=self._on_close)
 
-    def message_keep_alive(self):
+    def message_keep_alive(self) -> None:
         pass
 
-    def message_do_sync(self):
+    def message_do_sync(self) -> None:
         messages = self.pushover_open_client.download_messages()
         self.pushover_open_client.delete_all_messages()
         print(messages)  # TODO: fixme!!
@@ -513,10 +514,10 @@ class PushoverOpenClientRealTime:
             if "url" in message:
                 print("URL:    ", message["url"])
 
-    def message_reload_request(self):
+    def message_reload_request(self) -> None:
         pass
 
-    def message_error_permanent(self):
+    def message_error_permanent(self) -> None:
         pushover_open_client = PushoverOpenClient()
         pushover_open_client.login()
         pushover_open_client.register_device()
@@ -525,33 +526,37 @@ class PushoverOpenClientRealTime:
 
         self.pushover_open_client = pushover_open_client
 
-    def message_error(self):
+    def message_error(self) -> None:
         pass
 
-    def send_login(self, pushover_websocket_connection,
-                   pushover_websocket_login_string):
+    def send_login(self, pushover_websocket_connection: websocket.WebSocketApp,
+                   pushover_websocket_login_string: str) -> None:
         pushover_websocket_connection.send(pushover_websocket_login_string)
 
-    def run_forever(self):
+    def run_forever(self) -> None:
         self.websocketapp.run_forever()
 
-    def _on_open(self, websocketapp):
+    def _on_open(self, websocketapp: websocket.WebSocketApp) -> None:
         pushover_websocket_login_string = self.pushover_websocket_login_string
 
         self.send_login(pushover_websocket_connection=websocketapp,
-                        pushover_websocket_login_string=\
-                            pushover_websocket_login_string)
+                        pushover_websocket_login_string=
+                        pushover_websocket_login_string)
 
-    def _on_message(self, websocketapp, message):
+    def _on_message(self, websocketapp: websocket.WebSocketApp,
+                    message: bytes | str) -> None:
         if message in self.pushover_websocket_server_commands:
             self.pushover_websocket_server_commands[message]()
 
         if DEBUG:
             print(message, PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING[message])
 
-    def _on_error(self, websocketapp, exception):
+    def _on_error(self, websocketapp: websocket.WebSocketApp,
+                  exception: Exception) -> None:
         pass
 
-    def _on_close(self, websocketapp, close_status_code, close_msg):
+    # TODO: ckeck the type for `close_status_code`
+    def _on_close(self, websocketapp: websocket.WebSocketApp,
+                  close_status_code: int | str, close_msg: str) -> None:
         pass
 
