@@ -9,9 +9,12 @@ import json
 import os
 import requests
 import sys
-from typing import Callable
+import types
+# import typing
 
 import websocket
+
+FUNCTION = types.FunctionType
 
 DEBUG: bool = False
 
@@ -57,18 +60,42 @@ PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING: dict[bytes, str] = {
           "session is being closed. Do not automatically re-connect."
 }
 
-# these execute python functions
-COMMAND_FUNCTIONS_REGISTRY: dict = {}
+COMMAND_FUNCTIONS_REGISTRY: dict[str, FUNCTION] = dict()
+"""Registry for command functions.
 
-# these receive notifications from
-PARSING_FUNCTIONS_REGISTRY: dict = {}
+Functions registered here receive the text message of the notification
+as **positional arguments**, with the command itself being the first positional
+argument separated by spaces (as in a shell command).
 
-# these execute shell commands, from the allowed list, *args is passed as is
+The function name is registered as the command, and so
+the function is triggered when the first word of the notification
+message (ie., the command) is the name of the function.
+
+Todo:
+    *use `shutil` to improve parsing.
+"""
+
+COMMAND_PARSERS_REGISTRY: dict[str, FUNCTION] = dict()
+"""
+these parsers receive `raw_data` from the Pushover server. They are
+triggered if the first word (ie., the command) of the notification message
+is the name of the function.
+"""
+
+FILTERS_REGISTRY: set = set()
+"""
+All received notifications will be sent to the filters registered here.
+"""
+
 SHELL_COMMANDS_REGISTRY: set = set()
+"""
+These execute shell commands, from the allowed list, *args is passed as is.
+"""
 
 # when the alias is received, it executes command and args
 # { "alias": ["command", "arg1", "arg2", ...] }
-SHELL_COMMAND_ALIASES_REGISTRY: dict[str, str | list] = {}
+# SHELL_COMMAND_ALIASES_REGISTRY: dict[str, str | list] = dict()
+SHELL_COMMAND_ALIASES_REGISTRY: dict[str, list] = dict()
 
 
 def generate_new_device_name() -> str:
@@ -94,7 +121,7 @@ def print_data_errors(errors: list[str] | dict[str, list[str]]) -> None:
 
 
 # TODO: improve decorators typing annotations
-def register_command(f: Callable, *args, **kwargs) -> Callable:
+def register_command(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     """Decorator that registers command python functions.
 
     Commands execute user-defined python functions. The name of the function is
@@ -116,7 +143,7 @@ def register_command(f: Callable, *args, **kwargs) -> Callable:
 
 
 # TODO: improve decorators typing annotations
-def register_parser(f: Callable, *args, **kwargs) -> Callable:
+def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     """Decorator that registers perser python functions.
 
     Parser functions receive raw data received from each notification from the
@@ -762,7 +789,18 @@ class PushoverOpenClientRealTime:
         """
         pass
 
-    def process_each_message(self, message: dict):
+    def process_function_command(self):
+        pass
+
+    def process_parser_command(self):
+        pass
+
+    def process_parser(self):
+        pass
+
+    def process_message(self, message: dict):
+
+        raw_data = get_notification_model(**message)
 
         if "title" in message:
             print("TITLE:  ", message["title"])
@@ -772,7 +810,7 @@ class PushoverOpenClientRealTime:
         if "url" in message:
             print("URL:    ", message["url"])
 
-    def process_messages(self, messages: list[dict]):
+    def process_message_list(self, messages: list[dict]):
         """Process a list of notifications.
 
         This method processes a list of notifications, sending each of them
