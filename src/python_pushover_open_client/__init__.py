@@ -820,13 +820,15 @@ class PushoverOpenClientRealTime:
                 registered via this method or it's
                 decorator, ``@register_parser``.
         """
-        pass
 
-    def add_shell_command(self, function: FUNCTION) -> None:
-        pass
+        function_name = function.__name__
+        PARSERS_REGISTRY.update({function_name: function})
 
-    def add_shell_command_alias(self, function: FUNCTION) -> None:
-        pass
+    def add_shell_command(self, command: str) -> None:
+        SHELL_COMMANDS_REGISTRY.add(command)
+
+    def add_shell_command_alias(self, alias: str, command_line: str) -> None:
+        SHELL_COMMAND_ALIASES_REGISTRY.update({alias: command_line})
 
     def message_keep_alive(self) -> None:
         """Runs when a keep-alive message is received,
