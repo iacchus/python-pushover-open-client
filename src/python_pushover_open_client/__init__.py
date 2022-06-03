@@ -139,8 +139,8 @@ def register_shell_command(command: str):
     """Register a shell command.
 
     When a notification is received with the message's first word being this
-    command, the command is executed via shell. The other words are passed as
-    arguments to the command.
+    command, the command is executed via shell. The other words from the
+    notification are passed as arguments to that command.
 
     Args:
         command (str):
@@ -156,7 +156,7 @@ def register_shell_command_alias(alias: str, command_line: str | list):
     """Registers an alias to execute a command line.
 
     When alias is received via notification, the command line, (command + args)
-     are executed using shell.
+    is executed using shell.
 
     Args:
         alias (str): one word alias. When received as notification, will
@@ -174,6 +174,7 @@ def register_shell_command_alias(alias: str, command_line: str | list):
     """
 
     processed_alias = alias.split(' ')[0]  # alias should be only one word
+
     if isinstance(command_line, str):
         command_args = command_line.split(' ')
     # elif isinstance(command_line, list):
@@ -199,6 +200,7 @@ class PushoverOpenClient:
     set up to use it. The Pushover server will send HTTP status code 412 when
     logging in with only email and password if `self.twofa` is not set and the
     account requires it.
+    
     After setting the code in `self.twofa`, the login attempt should be made
     again.
     """
@@ -311,7 +313,7 @@ class PushoverOpenClient:
         In the case of the account being set up to use two-factor
         authentication, the first login attempt will fail, with this method
         setting `self.needs_twofa` to `True` and returning `False`; the token
-        then should be set directly at the `self.twofa`(str) or through
+        then should be set directly at the `self.twofa` (str) or through
         the `self.set_twofa(twofa: str)` method, and then this method
         `self.login` should be executed again to achieve the `secret`.
 
@@ -395,7 +397,7 @@ class PushoverOpenClient:
 
         Args:
             device_name (str, optional):
-            secret (ste, optional):
+            secret (str, optional):
             rewrite_creds_file (bool):
 
         Returns:
@@ -656,6 +658,7 @@ class PushoverOpenClient:
 
         return delete_messages_payload
 
+
 class PushoverOpenClientRealTime:
 
     pushover_websocket_server_commands = dict()
@@ -687,10 +690,10 @@ class PushoverOpenClientRealTime:
             b'A': self.message_error
         }
 
-        self.pushover_websocket_login_string = \
+        self.pushover_websocket_login_string =\
             pushover_open_client.get_websocket_login_string()
 
-        self.websocketapp = \
+        self.websocketapp =\
             websocket.WebSocketApp(pushover_websocket_server_url,
                                    on_open=self._on_open,
                                    on_message=self._on_message,
