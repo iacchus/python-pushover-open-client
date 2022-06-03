@@ -144,7 +144,7 @@ def register_command(f: FUNCTION, *args, **kwargs) -> FUNCTION:
 
 
 # TODO: improve decorators typing annotations
-def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
+def register_command_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     """Decorator that registers perser python functions.
 
     Parser functions receive raw data received from each notification from the
@@ -158,7 +158,7 @@ def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     def decorator(*args, **kwargs):
         return f(*args, **kwargs)
 
-    PARSING_FUNCTIONS_REGISTRY.update({f.__name__: f})
+    COMMAND_PARSERS_REGISTRY.update({f.__name__: f})
 
     return decorator()
 
@@ -777,6 +777,29 @@ class PushoverOpenClientRealTime:
                                    on_error=self._on_error,
                                    on_close=self._on_close)
 
+    """
+    command function
+    command parser
+    parser
+    shell command
+    shell command alias
+    """
+    def add_command_function(self, function: FUNCTION) -> None:
+        function_name = function.__name__
+        COMMAND_FUNCTIONS_REGISTRY.update({function_name: function})
+
+    def add_command_parser(self, function: FUNCTION) -> None:
+        pass
+
+    def add_parser(self, function: FUNCTION) -> None:
+        pass
+
+    def add_shell_command(self, function: FUNCTION) -> None:
+        pass
+
+    def add_shell_command_alias(self, function: FUNCTION) -> None:
+        pass
+
     def message_keep_alive(self) -> None:
         """Runs when a keep-alive message is received,
 
@@ -804,10 +827,11 @@ class PushoverOpenClientRealTime:
     def process_shell_alias(self, message):
         pass
 
-    def process_message(self, message: dict):
+    def process_message(self, message: dict) -> None:
 
         raw_data = get_notification_model(**message)
 
+        # TODO: PLEASE USE `shutil` HERE
         arguments = raw_data["message"].split(' ')
         first_word = arguments[0]
 
@@ -844,11 +868,11 @@ class PushoverOpenClientRealTime:
         if "url" in message:
             print("URL:    ", message["url"])
 
-    def process_message_list(self, messages: list[dict]):
+    def process_message_list(self, messages: list[dict]) -> None:
         """Process a list of notifications.
 
         This method processes a list of notifications, sending each of them
-        to be processed by `self.process_each_message`.
+        to be processed by ``self.process_each_message``.
 
         Args:
             messages (list[dict]): List of notifications.
