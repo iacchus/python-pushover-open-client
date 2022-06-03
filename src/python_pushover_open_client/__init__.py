@@ -786,7 +786,6 @@ class PushoverOpenClientRealTime:
 
         Returns:
             None
-
         """
         pass
 
@@ -864,7 +863,7 @@ class PushoverOpenClientRealTime:
             self.process_each_message(message)
 
     def message_do_sync(self) -> None:
-        """Runs when a message is received
+        """Runs when new notification(s) are received.
 
         This method is executed when the server sends a `b'!'` message. The
         Pushover's websocket server sends this message meaning that a new
@@ -886,6 +885,7 @@ class PushoverOpenClientRealTime:
     def message_reload_request(self) -> None:
         """Runs when a reload request message is received.
 
+        This method is executed when the client receives an `b'R'` message.
         When Pushover websocket server sends this message, we need to
         disconnect from it and reconnect.
 
@@ -898,8 +898,9 @@ class PushoverOpenClientRealTime:
     def message_error_permanent(self) -> None:
         """Runs when an permanente error message is received.
 
-        When this error is received, we should not connect again; instead,
-        login again and reenable the device.
+        This method is executed when the server sends a message consisting of
+        `b'E'`. When this error is received, we should not connect again;
+        instead, do login again and reenable the device.
 
         Returns:
             None
@@ -914,7 +915,11 @@ class PushoverOpenClientRealTime:
         self.pushover_open_client = pushover_open_client
 
     def message_error(self) -> None:
-        """Runs when a message is received
+        """Runs when an error message is received.
+
+        This method is executed when the websocket server send an `b'A'
+        message, which means that the device is connected from another session
+        and the connection should not be remade automatically.
 
         Returns:
             None
