@@ -701,32 +701,64 @@ class PushoverOpenClientRealTime:
                                    on_close=self._on_close)
 
     def message_keep_alive(self) -> None:
-        """
+        """Runs when a keep-alive message is received,
+
+        This method is executed when the server sends a `b'#'` message. This
+        is meant as a ping, and to keep the connection open in scenarios where
+        the connection would be close if no data was transferred in some time.
 
         Returns:
+            None
 
         """
         pass
 
-    def message_do_sync(self) -> None:
-        """
+    def process_each_message(self, message: dict):
+        if "title" in message:
+            print("TITLE:  ", message["title"])
+        print("MESSAGE:", message["message"])
+        if "url" in message:
+            print("URL:    ", message["url"])
+
+    def process_messages(self, messages: list[dict]):
+        """Process a list of notifications.
+
+        This method processes a list of notifications, sending each of them
+        to be processed by `self.process_each_message`.
+
+        Args:
+            messages (list[dict]): List of notifications.
 
         Returns:
+            None
+        """
+        print(messages)  # TODO: fixme!!
 
+        for message in messages:
+            self.process_each_message(message)
+
+    def message_do_sync(self) -> None:
+        """Runs when a message is received
+
+        This method is executed when the server sends a `b'!'` message. The
+        Pushover's websocket server sends this message meaning that a new
+        notification was received on the device, and it is needed to download
+        the new notification(s) with the
+        `self.pushover_open_client.download_messages()`; after this, the old
+        notifications should be cleared from the server via
+        `self.pushover_open_client.delete_all_messages()`;
+
+        Returns:
+            None
         """
 
         messages = self.pushover_open_client.download_messages()
         self.pushover_open_client.delete_all_messages()
-        print(messages)  # TODO: fixme!!
-        for message in messages:
-            if "title" in message:
-                print("TITLE:  ", message["title"])
-            print("MESSAGE:", message["message"])
-            if "url" in message:
-                print("URL:    ", message["url"])
+
+        self.process_messages(messages)
 
     def message_reload_request(self) -> None:
-        """
+        """Runs when a message is received
 
         Returns:
 
@@ -735,7 +767,7 @@ class PushoverOpenClientRealTime:
         pass
 
     def message_error_permanent(self) -> None:
-        """
+        """Runs when a message is received
 
         Returns:
 
@@ -750,7 +782,7 @@ class PushoverOpenClientRealTime:
         self.pushover_open_client = pushover_open_client
 
     def message_error(self) -> None:
-        """
+        """Runs when a message is received
 
         Returns:
 
