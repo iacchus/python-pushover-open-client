@@ -184,6 +184,34 @@ def register_shell_command_alias(alias: str, command_line: str | list):
     SHELL_COMMAND_ALIASES_REGISTRY.update({processed_alias: command_args})
 
 
+def get_notification_model(**kwargs):
+
+    notification_dict =\
+    {
+        "id": None,
+        "umid": None,
+        "title": None,
+        "message": None,
+        "app": None,
+        "aid": None,
+        "icon": None,
+        "date": None,
+        "queued_date": None,
+        "dispatched_date": None,
+        "priority": None,
+        "sound": None,
+        "url": None,
+        "url_title": None,
+        "acked": None,
+        "receipt": None,
+        "html": None,
+    }
+
+    notification_dict.update(**kwargs)
+
+    return notification_dict
+
+
 class PushoverOpenClient:
 
     credentials_filename = CREDENTIALS_FILENAME
@@ -299,7 +327,7 @@ class PushoverOpenClient:
             self.client_id = credentials["client_id"]
 
         if "secret" in credentials.keys():
-            self.client_id = credentials["secret"]
+            self.client_id = credentials["secret"]  # FIXME: f is this
 
         return self
 
@@ -714,9 +742,12 @@ class PushoverOpenClientRealTime:
         pass
 
     def process_each_message(self, message: dict):
+
         if "title" in message:
             print("TITLE:  ", message["title"])
+
         print("MESSAGE:", message["message"])
+
         if "url" in message:
             print("URL:    ", message["url"])
 
@@ -732,6 +763,7 @@ class PushoverOpenClientRealTime:
         Returns:
             None
         """
+
         print(messages)  # TODO: fixme!!
 
         for message in messages:
