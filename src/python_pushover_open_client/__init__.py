@@ -37,7 +37,7 @@ PUSHOVER_API_URL: str = "https://api.pushover.net/1"
 
 ENDPOINT_LOGIN: str = "{api_url}/users/login.json".format(api_url=PUSHOVER_API_URL)
 ENDPOINT_DEVICES: str = "{api_url}/devices.json".format(api_url=PUSHOVER_API_URL)
-ENDPOINT_MESSAGES : str= "{api_url}/messages.json".format(api_url=PUSHOVER_API_URL)
+ENDPOINT_MESSAGES: str = "{api_url}/messages.json".format(api_url=PUSHOVER_API_URL)
 ENDPOINT_UPDATE_HIGHEST_MESSAGE: str = \
         "{api_url}/devices/{device_id}/update_highest_message.json"
 
@@ -64,12 +64,12 @@ COMMAND_FUNCTIONS_REGISTRY: dict = {}
 PARSING_FUNCTIONS_REGISTRY: dict = {}
 
 # these execute shell commands, from the allowed list, *args is passed as is
-SHELL_COMMANDS_REGISTRY: list = []
+SHELL_COMMANDS_REGISTRY: set = set()
 
 # when the alias is received, it executes command and args
-SHELL_COMMAND_ALIASES_REGISTRY: dict = {}
-
 # { "alias": ["command", "arg1", "arg2", ...] }
+SHELL_COMMAND_ALIASES_REGISTRY: dict[str, str | list] = {}
+
 
 def generate_new_device_name() -> str:
     # device name is up to 25 chars, [A-Za-z0-9_-]
@@ -126,9 +126,21 @@ def register_parser(f: Callable, *args, **kwargs) -> Callable:
 
     return decorator()
 
-def register_shell_command(command):
+def register_shell_command(command: str):
+    """Register a shell command.
 
-    SHELL_COMMANDS_REGISTRY.update
+    When a notification is received with the message's first word being this
+    command, the command is executed via shell. The other words are passed as
+    arguments to the command.
+
+    Args:
+        command (str):
+
+    Returns:
+        None
+    """
+
+    SHELL_COMMANDS_REGISTRY.add(command.split()[0])
 
 
 class PushoverOpenClient:
