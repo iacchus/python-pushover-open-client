@@ -152,6 +152,37 @@ def register_shell_command(command: str):
     SHELL_COMMANDS_REGISTRY.add(command.split()[0])
 
 
+def register_shell_command_alias(alias: str, command_line: str | list):
+    """Registers an alias to execute a command line.
+
+    When alias is received via notification, the command line, (command + args)
+     are executed using shell.
+
+    Args:
+        alias (str): one word alias. When received as notification, will
+            execute the command line.
+        command_line (str | list): Command plus arguments to be execute. It can
+            be a string, which will be `str.split()`ed by the spaces in a list,
+            or a list in a similar fashion of that of the `args` parameter of
+            `subprocess.Popen` uses.
+
+    Returns:
+        None: Returns `None` if nothing happens; `None`, otherwise.
+
+    Todo:
+        Use shutil here to handle "same argument separated by spaces."
+    """
+
+    processed_alias = alias.split(' ')[0]  # alias should be only one word
+    if isinstance(command_line, str):
+        command_args = command_line.split(' ')
+    # elif isinstance(command_line, list):
+    else:
+        command_args = command_line
+
+    SHELL_COMMAND_ALIASES_REGISTRY.update({processed_alias: command_args})
+
+
 class PushoverOpenClient:
 
     credentials_filename = CREDENTIALS_FILENAME
