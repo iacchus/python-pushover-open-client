@@ -51,8 +51,8 @@ PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING: dict[bytes, str] = {
     b'!': "A new message has arrived; you should perform a sync.",
     b'R': "Reload request; you should drop your connection and re-connect.",
     b'E': "Error; a permanent problem occured and you should not "
-           "automatically re-connect. Prompt the user to login again or "
-           "re-enable the device.",
+          "automatically re-connect. Prompt the user to login again or "
+          "re-enable the device.",
     b'A': "Error; the device logged in from another session and this "
           "session is being closed. Do not automatically re-connect."
 }
@@ -95,11 +95,15 @@ def print_data_errors(errors: list[str] | dict[str, list[str]]) -> None:
 
 # TODO: improve decorators typing annotations
 def register_command(f: Callable, *args, **kwargs) -> Callable:
-    """Decorator who register command functions.
+    """Decorator that registers command python functions.
 
-    Commands execute user-defined functions. The name of the function is the
-    command, ie., the first word of the received notification; the other words
-    of the notification are the parameters.
+    Commands execute user-defined python functions. The name of the function is
+    the command, ie., the first word of the received notification; the other
+    words of the notification are the parameters.
+
+    The function arguments decorated by this decorator should have positional
+    arguments as needed, and  a declaration of `*args` in the case of
+    receiving more than those needed.
     """
 
     @functools.wraps(f)
@@ -113,10 +117,14 @@ def register_command(f: Callable, *args, **kwargs) -> Callable:
 
 # TODO: improve decorators typing annotations
 def register_parser(f: Callable, *args, **kwargs) -> Callable:
-    """Decorator who register perser functions.
+    """Decorator that registers perser python functions.
 
     Parser functions receive raw data received from each notification from the
-    pushover server, and parses it."""
+    pushover server, so to process them as needed.
+
+    Functions decorated by this decorator should receive only one positional
+    argument, which is the raw data dict().
+    """
 
     @functools.wraps(f)
     def decorator(*args, **kwargs):
@@ -125,6 +133,7 @@ def register_parser(f: Callable, *args, **kwargs) -> Callable:
     PARSING_FUNCTIONS_REGISTRY.update({f.__name__: f})
 
     return decorator()
+
 
 def register_shell_command(command: str):
     """Register a shell command.
