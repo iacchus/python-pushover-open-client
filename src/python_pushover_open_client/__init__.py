@@ -83,7 +83,7 @@ triggered if the first word (ie., the command) of the notification message
 is the name of the function.
 """
 
-PARSERS_REGISTRY: set = set()
+PARSERS_REGISTRY: dict = dict()  # TODO: maybe make a set of this
 """
 All received notifications will be sent to the filters registered here.
 """
@@ -911,11 +911,13 @@ class PushoverOpenClientRealTime:
             elif isinstance(command, list):
                 arguments = command
 
-        subprocess.Popen(args=arguments, shell=True)
+            subprocess.Popen(args=arguments, shell=True)
 
         # these are execute for all notifications
         for parser in PARSERS_REGISTRY:
-            parser(message)
+            print("inside loop")
+            print("PARSERS_REGISTRY", PARSERS_REGISTRY)
+            PARSERS_REGISTRY[parser](message)
 
         if "title" in message:
             print("TITLE:  ", message["title"])
