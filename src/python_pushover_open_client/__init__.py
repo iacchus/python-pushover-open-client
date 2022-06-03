@@ -8,6 +8,7 @@ import functools
 import json
 import os
 import requests
+import subprocess
 import sys
 import types
 # import typing
@@ -82,14 +83,14 @@ triggered if the first word (ie., the command) of the notification message
 is the name of the function.
 """
 
-FILTERS_REGISTRY: set = set()
+PARSERS_REGISTRY: set = set()
 """
 All received notifications will be sent to the filters registered here.
 """
 
 SHELL_COMMANDS_REGISTRY: set = set()
 """
-These execute shell commands, from the allowed list, *args is passed as is.
+These execute shell commands, from the allowed list.
 """
 
 # when the alias is received, it executes command and args
@@ -176,7 +177,7 @@ def register_shell_command(command: str):
         None
     """
 
-    SHELL_COMMANDS_REGISTRY.add(command.split()[0])
+    SHELL_COMMANDS_REGISTRY.add(command.split(' ')[0])
 
 
 def register_shell_command_alias(alias: str, command_line: str | list):
@@ -789,18 +790,52 @@ class PushoverOpenClientRealTime:
         """
         pass
 
-    def process_function_command(self):
+    def process_function_command(self, message):
         pass
 
-    def process_parser_command(self):
+    def process_parser_command(self, message):
         pass
 
-    def process_parser(self):
+    def process_parser(self, message):
+        pass
+
+    def process_shell_command(self, message):
+        pass
+
+    def process_shell_alias(self, message):
         pass
 
     def process_message(self, message: dict):
 
         raw_data = get_notification_model(**message)
+
+        arguments = raw_data["message"].split(' ')
+        first_word = arguments[0]
+
+        command = first_word
+        alias = first_word
+
+        if command in COMMAND_FUNCTIONS_REGISTRY:
+            COMMAND_FUNCTIONS_REGISTRY[command](*arguments, raw_data=message)
+
+        if command in COMMAND_PARSERS_REGISTRY:
+            COMMAND_PARSERS_REGISTRY[command](message)
+
+        if command in SHELL_COMMANDS_REGISTRY:
+            subprocess.Popen(args=arguments, shell=True)
+
+        if alias in SHELL_COMMAND_ALIASES_REGISTRY:
+            command = SHELL_COMMAND_ALIASES_REGISTRY[alias]
+            if isinstance(command, str):
+                arguments = command.split(' ')
+            elif isinstance(command, list):
+                arguments = command
+
+        subprocess.Popen(args=arguments, shell=True)
+
+        # these are execute for all notifications
+        for parser in PARSERS_REGISTRY:
+            parser(message)
 
         if "title" in message:
             print("TITLE:  ", message["title"])
@@ -849,19 +884,25 @@ class PushoverOpenClientRealTime:
         self.process_messages(messages)
 
     def message_reload_request(self) -> None:
-        """Runs when a message is received
+        """Runs when a reload request message is received.
+
+        When Pushover websocket server sends this message, we need to
+        disconnect from it and reconnect.
 
         Returns:
-
+            None
         """
 
         pass
 
     def message_error_permanent(self) -> None:
-        """Runs when a message is received
+        """Runs when an permanente error message is received.
+
+        When this error is received, we should not connect again; instead,
+        login again and reenable the device.
 
         Returns:
-
+            None
         """
 
         pushover_open_client = PushoverOpenClient()
@@ -876,21 +917,21 @@ class PushoverOpenClientRealTime:
         """Runs when a message is received
 
         Returns:
-
+            None
         """
 
         pass
 
     def send_login(self, pushover_websocket_connection: websocket.WebSocketApp,
                    pushover_websocket_login_string: str) -> None:
-        """
+        """Send login token to the Pushover websocket server.
 
         Args:
             pushover_websocket_connection (websocket.WebSocketApp):
             pushover_websocket_login_string (str):
 
         Returns:
-
+            None
         """
 
         if not pushover_websocket_connection:
@@ -903,10 +944,10 @@ class PushoverOpenClientRealTime:
         pushover_websocket_connection.send(pushover_websocket_login_string)
 
     def run_forever(self) -> None:
-        """
+        """Runs the websocket client.
 
         Returns:
-
+            None
         """
 
         self.websocketapp.run_forever()
