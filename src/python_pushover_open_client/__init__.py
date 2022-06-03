@@ -192,6 +192,9 @@ def get_notification_model(**kwargs):
     lacking on the server response because it is empty, now we have it set
     to be processed as such.
 
+    The description of these keys are on the API documentation at:
+    https://pushover.net/api/client#download
+
     Args:
         **kwargs (dict): A dict/expanded dict of the received values from the
         notification server.
@@ -202,25 +205,28 @@ def get_notification_model(**kwargs):
     """
 
     notification_dict =\
-    {
-        "id": None,
-        "umid": None,
-        "title": None,
-        "message": None,
-        "app": None,
-        "aid": None,
-        "icon": None,
-        "date": None,
-        "queued_date": None,
-        "dispatched_date": None,
-        "priority": None,
-        "sound": None,
-        "url": None,
-        "url_title": None,
-        "acked": None,
-        "receipt": None,
-        "html": None,
-    }
+        {
+            "id": None,
+            "id_str": None,
+            "umid": None,
+            "umid_str": None,
+            "title": None,
+            "message": None,
+            "app": None,
+            "aid": None,
+            "aid_str": None,
+            "icon": None,
+            "date": None,
+            "queued_date": None,
+            "dispatched_date": None,
+            "priority": None,
+            "sound": None,
+            "url": None,
+            "url_title": None,
+            "acked": None,
+            "receipt": None,
+            "html": None,
+        }
 
     notification_dict.update(**kwargs)
 
