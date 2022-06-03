@@ -9,7 +9,7 @@ import json
 import os
 import requests
 import sys
-from typing import Callable, Self
+from typing import Callable
 
 import websocket
 
@@ -57,9 +57,19 @@ PUSHOVER_WEBSOCKET_SERVER_MESSAGES_MEANING: dict[bytes, str] = {
           "session is being closed. Do not automatically re-connect."
 }
 
-COMMAND_FUNCTIONS_REGISTRY: dict[str, list] = {}
-PARSING_FUNCTIONS_REGISTRY: dict[str, dict] = {}
+# these execute python functions
+COMMAND_FUNCTIONS_REGISTRY: dict = {}
 
+# these receive notifications from
+PARSING_FUNCTIONS_REGISTRY: dict = {}
+
+# these execute shell commands, from the allowed list, *args is passed as is
+SHELL_COMMANDS_REGISTRY: list = []
+
+# when the alias is received, it executes command and args
+SHELL_COMMAND_ALIASES_REGISTRY: dict = {}
+
+# { "alias": ["command", "arg1", "arg2", ...] }
 
 def generate_new_device_name() -> str:
     # device name is up to 25 chars, [A-Za-z0-9_-]
@@ -91,7 +101,14 @@ def register_command(f: Callable, *args, **kwargs) -> Callable:
     command, ie., the first word of the received notification; the other words
     of the notification are the parameters.
     """
-    pass
+
+    @functools.wraps(f)
+    def decorator(*args, **kwargs):
+        return f(*args, **kwargs)
+
+    COMMAND_FUNCTIONS_REGISTRY.update({f.__name__: f})
+
+    return decorator
 
 
 # TODO: improve decorators typing annotations
@@ -100,7 +117,18 @@ def register_parser(f: Callable, *args, **kwargs) -> Callable:
 
     Parser functions receive raw data received from each notification from the
     pushover server, and parses it."""
-    pass
+
+    @functools.wraps(f)
+    def decorator(*args, **kwargs):
+        return f(*args, **kwargs)
+
+    PARSING_FUNCTIONS_REGISTRY.update({f.__name__: f})
+
+    return decorator()
+
+def register_shell_command(command):
+
+    SHELL_COMMANDS_REGISTRY.update
 
 
 class PushoverOpenClient:
@@ -166,7 +194,7 @@ class PushoverOpenClient:
         if not email or not password:
             self.load_from_credentials_file()
 
-    def load_from_email_and_password(self, email: str, password: str) -> Self:
+    def load_from_email_and_password(self, email: str, password: str) -> object:
         """Sets the credentials preparing the class for `self.login`.
 
         Receives thethe bare minimum credentials needed to connect to the
@@ -189,7 +217,7 @@ class PushoverOpenClient:
         return self
 
     def load_from_credentials_file(self, file_path: str =\
-                                   CREDENTIALS_FILENAME) -> Self:
+                                   CREDENTIALS_FILENAME) -> object:
         """Loads class through credentials file.
 
         Args:
