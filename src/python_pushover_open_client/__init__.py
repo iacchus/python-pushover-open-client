@@ -147,11 +147,11 @@ def register_command(f: FUNCTION, *args, **kwargs) -> FUNCTION:
 def register_command_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     """Decorator that registers perser python functions.
 
-    Parser functions receive raw data received from each notification from the
-    pushover server, so to process them as needed.
+    Parser functions get raw data from each notification received from the
+    pushover server for processing.
 
     Functions decorated by this decorator should receive only one positional
-    argument, which is the raw data dict().
+    argument, which is the raw data dict.
     """
 
     @functools.wraps(f)
@@ -159,6 +159,28 @@ def register_command_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
         return f(*args, **kwargs)
 
     COMMAND_PARSERS_REGISTRY.update({f.__name__: f})
+
+    return decorator()
+
+
+def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
+    """Decorator that registers perser python functions.
+
+    The functions registered using this decorator will be executed for all
+    of the received notifications.
+
+    Parser functions get raw data from each notification received from the
+    pushover server for processing.
+
+    Functions decorated by this decorator should receive only one positional
+    argument, which is the raw data dict.
+    """
+
+    @functools.wraps(f)
+    def decorator(*args, **kwargs):
+        return f(*args, **kwargs)
+
+    PARSERS_REGISTRY.update({f.__name__: f})
 
     return decorator()
 
@@ -177,7 +199,7 @@ def register_shell_command(command: str):
         None
     """
 
-    SHELL_COMMANDS_REGISTRY.add(command.split(' ')[0])
+    SHELL_COMMANDS_REGISTRY.add(command.split()[0])
 
 
 def register_shell_command_alias(alias: str, command_line: str | list):
@@ -201,10 +223,10 @@ def register_shell_command_alias(alias: str, command_line: str | list):
         Use shutil here to handle "same argument separated by spaces."
     """
 
-    processed_alias = alias.split(' ')[0]  # alias should be only one word
+    processed_alias = alias.split()[0]  # alias should be only one word
 
     if isinstance(command_line, str):
-        command_args = command_line.split(' ')
+        command_args = command_line.split()
     # elif isinstance(command_line, list):
     else:
         command_args = command_line
@@ -862,7 +884,7 @@ class PushoverOpenClientRealTime:
         raw_data = get_notification_model(**message)
 
         # TODO: PLEASE USE `shutil` HERE
-        arguments = raw_data["message"].split(' ')
+        arguments = raw_data["message"].split()
         first_word = arguments[0]
 
         command = first_word
@@ -880,7 +902,7 @@ class PushoverOpenClientRealTime:
         if alias in SHELL_COMMAND_ALIASES_REGISTRY:
             command = SHELL_COMMAND_ALIASES_REGISTRY[alias]
             if isinstance(command, str):
-                arguments = command.split(' ')
+                arguments = command.split()
             elif isinstance(command, list):
                 arguments = command
 
