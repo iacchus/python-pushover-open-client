@@ -42,7 +42,7 @@ Soon...
 .. _pyscaffold-notes:
 
 How to test it for now
-======================
+----------------------
 
 The script expects a file at the home directory named ``~/.pushover-open-client-creds.json``. The file should be a JSON file with account's ``email`` and ``password``, this way:
 

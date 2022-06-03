@@ -112,7 +112,8 @@ def generate_new_device_name() -> str:
 def print_data_errors(errors: list[str] | dict[str, list[str]]) -> None:
     # errors can be a list or a dict
     if isinstance(errors, list):
-        for error in errors: print(error)
+        for error in errors:
+            print(error)
     elif isinstance(errors, dict):
         for key, error_list in errors.items():
             for error in error_list:
@@ -160,7 +161,7 @@ def register_command_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
 
     COMMAND_PARSERS_REGISTRY.update({f.__name__: f})
 
-    return decorator()
+    return decorator
 
 
 def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
@@ -182,7 +183,7 @@ def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
 
     PARSERS_REGISTRY.update({f.__name__: f})
 
-    return decorator()
+    return decorator
 
 
 def register_shell_command(command: str):
@@ -308,21 +309,21 @@ class PushoverOpenClient:
 
     messages: dict[int, dict] = dict()  # { message_id: {message_dict...}, }
 
-    login_response: requests.Response = None
-    login_response_data = dict()
-    login_errors: list[str] | dict[list] = None
+    login_response: requests.Response | None = None
+    login_response_data: dict | None = dict()
+    login_errors: list[str] | dict[list] | None = None
 
-    device_registration_response: requests.Response = None
-    device_registration_response_data: dict = dict()
-    device_registration_errors: list[str] | dict[list] = None
+    device_registration_response: requests.Response | None = None
+    device_registration_response_data: dict | None = dict()
+    device_registration_errors: list[str] | dict[list] | None = None
 
-    message_downloading_response: requests.Response = None
-    message_downloading_response_data: dict = dict()
-    message_downloading_errors: list[str]  | dict[list] = None
+    message_downloading_response: requests.Response | None = None
+    message_downloading_response_data: dict | None= dict()
+    message_downloading_errors: list[str] | dict[list] | None = None
 
-    update_highest_message_response: requests.Response = None
-    update_highest_message_response_data: dict = dict()
-    update_highest_message_errors: list[str] | dict[list] = None
+    update_highest_message_response: requests.Response | None = None
+    update_highest_message_response_data: dict | None = dict()
+    update_highest_message_errors: list[str] | dict[list] | None = None
 
     def __init__(self, email: str = None, password: str = None) -> None:
         """Initializes the class, loading the basic credentials.
@@ -403,7 +404,7 @@ class PushoverOpenClient:
         return self
 
     def login(self, email: str = None, password: str = None, twofa: str = None,
-              rewrite_creds_file: bool = True) -> str | bool:
+              rewrite_creds_file: bool = True) -> str | None:
         """Executes login, acquiring a `secret`.
 
         If `email` or `account` are not given, this method will use those
@@ -437,7 +438,8 @@ class PushoverOpenClient:
 
         if self.needs_twofa:
             if not twofa and not self.twofa:
-                return False
+                return None
+                # return False
             if twofa: twofa = twofa
             elif self.needs_twofa: twofa = self.twofa
 
@@ -723,7 +725,7 @@ class PushoverOpenClient:
         }
 
         if twofa:
-            login_payload({"twofa": twofa})
+            login_payload.update({"twofa": twofa})
 
         return login_payload
 
@@ -757,6 +759,8 @@ class PushoverOpenClient:
 
         return delete_messages_payload
 
+def hey():
+    pass
 
 class PushoverOpenClientRealTime:
 
@@ -882,6 +886,7 @@ class PushoverOpenClientRealTime:
     def process_message(self, message: dict) -> None:
 
         raw_data = get_notification_model(**message)
+        print(raw_data)
 
         # TODO: PLEASE USE `shutil` HERE
         arguments = raw_data["message"].split()
@@ -936,7 +941,7 @@ class PushoverOpenClientRealTime:
         print(messages)  # TODO: fixme!!
 
         for message in messages:
-            self.process_each_message(message)
+            self.process_message(message)
 
     def message_do_sync(self) -> None:
         """Runs when new notification(s) are received.
@@ -956,7 +961,7 @@ class PushoverOpenClientRealTime:
         messages = self.pushover_open_client.download_messages()
         self.pushover_open_client.delete_all_messages()
 
-        self.process_messages(messages)
+        self.process_message_list(messages)
 
     def message_reload_request(self) -> None:
         """Runs when a reload request message is received.
@@ -972,7 +977,7 @@ class PushoverOpenClientRealTime:
         pass
 
     def message_error_permanent(self) -> None:
-        """Runs when an permanente error message is received.
+        """Runs when an permanent error message is received.
 
         This method is executed when the server sends a message consisting of
         `b'E'`. When this error is received, we should not connect again;
