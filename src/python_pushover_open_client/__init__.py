@@ -785,13 +785,41 @@ class PushoverOpenClientRealTime:
     shell command alias
     """
     def add_command_function(self, function: FUNCTION) -> None:
+        """Registers a function as a command.
+
+        Args:
+            function (Callable): Reference to the function to be executed for
+                this command. When the first word of a notification is the
+                command, ie., the function name, the notification text will be
+                passed to the function as *args, to be processed.
+        """
+
         function_name = function.__name__
         COMMAND_FUNCTIONS_REGISTRY.update({function_name: function})
 
     def add_command_parser(self, function: FUNCTION) -> None:
-        pass
+        """Registers a function as a command parser.
+
+        Args:
+            function (Callable): Reference to the function to be executed for
+                this command. When the first word of a notification is the
+                command, ie., the function name, the raw notification dict will
+                be passed to the function, to be parsed.
+        """
+
+        function_name = function.__name__
+        COMMAND_PARSERS_REGISTRY.update({function_name: function})
 
     def add_parser(self, function: FUNCTION) -> None:
+        """Registers a function as parser.
+
+        Args:
+            function (Callable): Reference to the function to be executed for
+                this command. All notifications received have it's raw data,
+                as received by the Pushover server, passed to the functions
+                registered via this method or it's
+                decorator, ``@register_parser``.
+        """
         pass
 
     def add_shell_command(self, function: FUNCTION) -> None:
