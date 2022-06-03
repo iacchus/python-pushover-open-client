@@ -185,6 +185,21 @@ def register_shell_command_alias(alias: str, command_line: str | list):
 
 
 def get_notification_model(**kwargs):
+    """Makes a notification model.
+
+    We use this to have a notification model with all values that can be
+    returned by the notification server initialized to None. If a value is
+    lacking on the server response because it is empty, now we have it set
+    to be processed as such.
+
+    Args:
+        **kwargs (dict): A dict/expanded dict of the received values from the
+        notification server.
+
+    Returns:
+        dict: The notification model dict with the notification values
+        filled up.
+    """
 
     notification_dict =\
     {
@@ -323,11 +338,11 @@ class PushoverOpenClient:
         self.email = credentials["email"]
         self.password = credentials["password"]
 
-        if "client_id" in credentials.keys():
-            self.client_id = credentials["client_id"]
+        if "device_id" in credentials.keys():
+            self.device_id = credentials["device_id"]
 
         if "secret" in credentials.keys():
-            self.client_id = credentials["secret"]  # FIXME: f is this
+            self.secret = credentials["secret"]
 
         return self
 
