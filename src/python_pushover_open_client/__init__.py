@@ -190,7 +190,7 @@ def register_parser(f: FUNCTION, *args, **kwargs) -> FUNCTION:
     return decorator
 
 
-def register_shell_command(command: str):
+def register_shell_command(command: str) -> None:
     """Register a shell command.
 
     When a notification is received with the message's first word being this
@@ -207,7 +207,7 @@ def register_shell_command(command: str):
     SHELL_COMMANDS_REGISTRY.add(command.split()[0])
 
 
-def register_shell_command_alias(alias: str, command_line: str | list):
+def register_shell_command_alias(alias: str, command_line: str | list) -> None:
     """Registers an alias to execute a command line.
 
     When alias is received via notification, the command line, (command + args)
@@ -230,16 +230,11 @@ def register_shell_command_alias(alias: str, command_line: str | list):
 
     processed_alias = alias.split()[0]  # alias should be only one word
 
-    if isinstance(command_line, str):
-        command_args = command_line.split()
-    # elif isinstance(command_line, list):
-    else:
-        command_args = command_line
-
-    SHELL_COMMAND_ALIASES_REGISTRY.update({processed_alias: command_args})
+    SHELL_COMMAND_ALIASES_REGISTRY \
+        .update({processed_alias: command_line})
 
 
-def get_notification_model(**kwargs):
+def get_notification_model(**kwargs) -> dict[str, str | int]:
     """Makes a notification model.
 
     We use this to have a notification model with all values that can be
@@ -892,6 +887,7 @@ class PushoverOpenClientRealTime:
 
         # TODO: PLEASE USE `shlex` HERE
         arguments = raw_data["message"].split()
+        arguments_str = " ".join(arguments)  # useful for Popen with shell=True
         first_word = arguments[0]
 
         command = first_word
@@ -904,20 +900,15 @@ class PushoverOpenClientRealTime:
             COMMAND_PARSERS_REGISTRY[command](message)
 
         if command in SHELL_COMMANDS_REGISTRY:
-            subprocess.Popen(args=arguments, shell=True)
+            subprocess.Popen(args=arguments_str, shell=True)
 
         if alias in SHELL_COMMAND_ALIASES_REGISTRY:
-            command = SHELL_COMMAND_ALIASES_REGISTRY[alias]
-            if isinstance(command, str):
-                arguments = command.split()
-            elif isinstance(command, list):
-                arguments = command
+            command_str = SHELL_COMMAND_ALIASES_REGISTRY[alias]
 
-            subprocess.Popen(args=arguments, shell=True)
+            subprocess.Popen(args=command_str, shell=True)
 
-        # these are execute for all notifications
+        # these are executed for all notifications
         for parser in PARSERS_REGISTRY:
-            print("inside loop")
             print("PARSERS_REGISTRY", PARSERS_REGISTRY)
             PARSERS_REGISTRY[parser](message)
 
