@@ -23,6 +23,9 @@
         :alt: Twitter
         :target: https://twitter.com/python-pushover-open-client
 
+.. image:: https://img.shields.io/pypi/l/python-pushover-open-client.svg
+   :target: https://pypi.python.org/pypi/python-pushover-open-client/
+
 .. image:: https://img.shields.io/pypi/v/python-pushover-open-client.svg
     :alt: PyPI-Server
     :target: https://pypi.org/project/python-pushover-open-client/
@@ -95,6 +98,11 @@ Programatically
 ---------------
 
 Soon.. Example is better. Decorators ``@register_command`` etc .
+
+Command line tool
+-----------------
+
+Let's use Python's `click` to make a fancy interface to this program?
 
 A Little More Inner
 ===================
