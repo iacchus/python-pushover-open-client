@@ -27,10 +27,10 @@
     :alt: PyPI-Server
     :target: https://pypi.org/project/python-pushover-open-client/
 
-.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/python-pushover-open-client.svg
+.. image:: https://img.shields.io/pypi/pyversions/python-pushover-open-client.svg
    :target: https://pypi.python.org/pypi/python-pushover-open-client/
 
-.. |PyPI status| image:: https://img.shields.io/pypi/status/python-pushover-open-client.svg
+.. image:: https://img.shields.io/pypi/status/python-pushover-open-client.svg
    :target: https://pypi.python.org/pypi/python-pushover-open-client/
 
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
