@@ -23,26 +23,38 @@
         :alt: Twitter
         :target: https://twitter.com/python-pushover-open-client
 
+    .. image:: https://img.shields.io/pypi/v/python-pushover-open-client.svg
+        :alt: PyPI-Server
+        :target: https://pypi.org/project/python-pushover-open-client/
+
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
 |
 
-===========================
-python-pushover-open-client
-===========================
-
+``python-pushover-open-client``
+===============================
 
     Command line app and framework for receiving Pushover push notifications in real time
 
-
-Soon...
-
 .. _pyscaffold-notes:
 
-How to test it for now
-----------------------
+Features
+========
+
+* Receive notifications real time
+* Execute python funcions via commands received by notification, passing arguments
+* Execute shell commands, passing arguments
+* Execute python functions to all received notifications (eg,. you can use ``Popen`` to send all notifications to ``notify-send``.)
+
+Installing
+==========
+
+    pip install python-pushover-open-client
+
+Setting Up
+==========
 
 The script expects a file at the home directory named ``~/.pushover-open-client-creds.json``. The file should be a JSON file with account's ``email`` and ``password``, this way:
 
@@ -56,7 +68,15 @@ file: ``~/.pushover-open-client-creds.json``
     "password": "M4HSUP3RBPASS"
   }
 
-Given the above, by logging and getting an auth secret, a new device will be created wielding it's device_id, and that file will be updated containing all these four values
+Given the above, by logging and getting an auth secret, a new device will be created wielding it's device_id, and that file will be updated containing all these four values.
+
+Using
+=====
+
+Programatically
+---------------
+
+Soon.. Example is better. Decorators ``@register_command`` etc .
 
 Contributing
 ============
