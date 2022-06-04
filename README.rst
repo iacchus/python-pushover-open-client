@@ -64,8 +64,8 @@ Installing
 
     pip install python-pushover-open-client
 
-**Python minimum version 3.10** is needed. **(because of the `|` union
-annotations.)**
+**Python minimum version 3.10** is needed. *(because of the `|` union
+annotations.)*
 
 Setting Up
 ==========
