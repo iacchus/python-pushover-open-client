@@ -759,8 +759,6 @@ class PushoverOpenClient:
 
         return delete_messages_payload
 
-def hey():
-    pass
 
 class PushoverOpenClientRealTime:
 
