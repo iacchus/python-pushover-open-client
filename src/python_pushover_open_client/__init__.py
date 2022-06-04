@@ -8,6 +8,7 @@ import functools
 import json
 import os
 import requests
+import shlex
 import shutil
 import subprocess
 import sys
@@ -76,7 +77,7 @@ the function is triggered when the first word of the notification
 message (ie., the command) is the name of the function.
 
 Todo:
-    *use `shutil` to improve parsing.
+    *use `shlex` to improve parsing.
 """
 
 COMMAND_PARSERS_REGISTRY: dict[str, FUNCTION] = dict()
@@ -224,7 +225,7 @@ def register_shell_command_alias(alias: str, command_line: str | list):
         None: Returns `None` if nothing happens; `None`, otherwise.
 
     Todo:
-        Use shutil here to handle "same argument separated by spaces."
+        Use shlex here to handle "same argument separated by spaces."
     """
 
     processed_alias = alias.split()[0]  # alias should be only one word
@@ -889,7 +890,7 @@ class PushoverOpenClientRealTime:
         raw_data = get_notification_model(**message)
         print(raw_data)
 
-        # TODO: PLEASE USE `shutil` HERE
+        # TODO: PLEASE USE `shlex` HERE
         arguments = raw_data["message"].split()
         first_word = arguments[0]
 
