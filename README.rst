@@ -117,7 +117,7 @@ file: ``notify.py``
     # Let's use a decorator to registrate a command function; it will be executed
     # when a message with `mycmd_rawdata` as the first word is received. All
     # the arguments, *ie.*, all the words in the notification, including
-    # `mycmd` will be passed to ``*args``:
+    # `mycmd_rawdata` will be passed to ``*args``:
 
     @register_command
     def mycmd_rawdata(*args, raw_data=None):
