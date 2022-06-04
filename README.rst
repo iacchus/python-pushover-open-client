@@ -187,8 +187,8 @@ Please open an issue if you want to contribute with code. Or use discussions.
 
 The sources' package in reality contain only two files:
 
-* `__init__.py`_ - This contains the ``python_pushover_open_client`` library itself.
-* `__main__.py`_ - Will hold the command-line interface logic for the ``pushover-open-client`` command as it is developed.
+* `__init__.py <https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__init__.py>`_ - This contains the ``python_pushover_open_client`` library itself.
+* `__main__.py <https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__main__.py>`_ - Will hold the command-line interface logic for the ``pushover-open-client`` command as it is developed.
 
 Support
 =======
@@ -206,8 +206,7 @@ Note
 
 This project has been set up using PyScaffold 4.1.4. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
-.. ___init__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__init__.py
-.. ___main__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__main__.py
+
 .. _installed the package: https://github.com/iacchus/python-pushover-open-client#installing
 .. _entered your Pushover credentials: https://github.com/iacchus/python-pushover-open-client#setting-up
 .. _Pushover Open Client API documentation: https://pushover.net/api/client
