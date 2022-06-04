@@ -27,6 +27,9 @@
     :alt: PyPI-Server
     :target: https://pypi.org/project/python-pushover-open-client/
 
+.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/python-pushover-open-client.svg
+   :target: https://pypi.python.org/pypi/python-pushover-open-client/
+
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
@@ -94,7 +97,7 @@ A Little More Inner
 ===================
 
 This package is based in two classes, some decorators to register functions
-from, user scripts, some functions to register other stuff to be executed by
+from user scripts, some functions to register other stuff to be executed by
 notifications.
 
 The two classes are ``python_pushover_open_client.PushoverOpenClient`` and
@@ -127,7 +130,7 @@ the code.
 Is it ready already?
 ====================
 
-100% and going on.
+100%
 
 Note
 ====
