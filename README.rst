@@ -115,16 +115,16 @@ file: ``notify.py``
 
 
     # Let's use a decorator to registrate a command function; it will be executed
-    # when a message with `mycmd` as the first word is received. All arguments,
-    # *ie.*, all the words in the notification, including `mycmd` will be passed
-    # to ``*args``:
+    # when a message with `mycmd_rawdata` as the first word is received. All
+    # the arguments, *ie.*, all the words in the notification, including
+    # `mycmd` will be passed to ``*args``:
 
     @register_command
     def mycmd_rawdata(*args, raw_data=None):
         print("RAW DATA IS:", raw_data)
 
-    # this decorator register a parser which is execute for each newnotification
-    # received; here we have two examples:
+    # this decorator register a parser which is executed for each new
+    # notification received; here we have two examples:
 
     @register_parser
     def my_notify_send_parser(raw_data=None):
@@ -140,8 +140,8 @@ file: ``notify.py``
     client = PushoverOpenClientRealTime()
     client.run_forever()
 
-You can save the script above to a file (*eg*.``~/notify.py``), then make it
-executable and run:
+You can save the script above to a file (*eg*. ``~/notify.py``), then make it
+executable and run, after you have `installed the package`_  and `entered your Pushover credentials`_:
 
 .. code:: sh
 
@@ -202,5 +202,7 @@ Note
 This project has been set up using PyScaffold 4.1.4. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
 
+.. _installed the package: https://github.com/iacchus/python-pushover-open-client#setting-up
+.. _entered your Pushover credentials: https://github.com/iacchus/python-pushover-open-client#installing
 .. _Pushover Open Client API documentation: https://pushover.net/api/client
 .. _Pushover website: https://pushover.net
