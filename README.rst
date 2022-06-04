@@ -36,7 +36,7 @@
 ``python-pushover-open-client``
 ===============================
 
-    Command line app and framework for receiving and processing Pushover push notifications in real time.
+Command line app and framework for receiving and processing Pushover push notifications in real time.
 
 .. _pyscaffold-notes:
 
@@ -54,9 +54,12 @@ Features
 Installing
 ==========
 
+::
+
     pip install python-pushover-open-client
 
-Python minimum version 3.10 is needed.
+**Python minimum version 3.10** is needed. **(because of the `|` union
+annotations.)**
 
 Setting Up
 ==========
@@ -103,17 +106,17 @@ to the Pushover's websocket server with the given credentials (``secret`` and
 ``device_id``) and keep the connection open, receiving messages and executing
 callbacks when and according to each server message is received.
 
-By now, decorators and top level are used to register functions to be executed
-when certain commands are received by notification (``@register_command``,
-``@register_command_parser``, ``register_shell_command()``,
-``register_shell_command_alias()``), or to register parsers which will be
-executed when every notification is received ``@register_parser``.)
+By now, decorators and top level functions are used to register functions to
+be executed when certain commands are received by notification
+(``@register_command``, ``@register_command_parser``,
+``register_shell_command()``, ``register_shell_command_alias()``),
+or to register parsers which will be executed when every notification is
+received ``@register_parser``.)
 
 Contributing
 ============
 
-Please open an issue if you want to contribute with code.
-
+Please open an issue if you want to contribute with code. Or use discussions.
 
 Support
 =======
@@ -124,8 +127,7 @@ the code.
 Is it ready already?
 ====================
 
-No, not really, but will be soon. All steps of the app are already implemented,
-almost all is done.
+100% and going on.
 
 Note
 ====
