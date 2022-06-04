@@ -7,7 +7,7 @@
     .. image:: https://readthedocs.org/projects/python-pushover-open-client/badge/?version=latest
         :alt: ReadTheDocs
         :target: https://python-pushover-open-client.readthedocs.io/en/stable/
-    .. image:: https://img.shields.io/coveralls/github/<USER>/python-pushover-open-client/main.svg
+    .. image:: https://immg.shields.io/coveralls/github/<USER>/python-pushover-open-client/main.svg
         :alt: Coveralls
         :target: https://coveralls.io/r/<USER>/python-pushover-open-client
     .. image:: https://img.shields.io/pypi/v/python-pushover-open-client.svg
@@ -23,9 +23,9 @@
         :alt: Twitter
         :target: https://twitter.com/python-pushover-open-client
 
-    .. image:: https://img.shields.io/pypi/v/python-pushover-open-client.svg
-        :alt: PyPI-Server
-        :target: https://pypi.org/project/python-pushover-open-client/
+.. image:: https://img.shields.io/pypi/v/python-pushover-open-client.svg
+    :alt: PyPI-Server
+    :target: https://pypi.org/project/python-pushover-open-client/
 
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
