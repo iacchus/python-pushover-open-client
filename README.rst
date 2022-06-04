@@ -97,7 +97,60 @@ Using
 Programatically
 ---------------
 
-Soon.. Example is better. Decorators ``@register_command`` etc .
+Here is an example script of how using decorators to use the lib. More examples
+will be added soon, as there are more decorators/functions to be used.
+
+file: ``notify.py``
+~~~~~~~~~~~~~~~~~~~
+
+::
+
+    #!/usr/bin/env python
+
+    from subprocess import Popen
+
+    from python_pushover_open_client import register_command
+    from python_pushover_open_client import register_parser
+    from python_pushover_open_client import PushoverOpenClientRealTime
+
+
+    # Let's use a decorator to registrate a command function; it will be executed
+    # when a message with `mycmd` as the first word is received. All arguments,
+    # *ie.*, all the words in the notification, including `mycmd` will be passed
+    # to ``*args``:
+
+    @register_command
+    def mycmd_rawdata(*args, raw_data=None):
+        print("RAW DATA IS:", raw_data)
+
+    # this decorator register a parser which is execute for each newnotification
+    # received; here we have two examples:
+
+    @register_parser
+    def my_notify_send_parser(raw_data=None):
+        args_str = "notify-send \"{message}\"".format(message=raw_data["message"])
+        Popen(args=args_str, shell=True)
+
+
+    @register_parser
+    def my_print_parser(raw_data=None):
+        print("MESSAGE RECEIVED:", raw_data)
+
+    # this instantiates the Pushover websocket class and runs it:
+    client = PushoverOpenClientRealTime()
+    client.run_forever()
+
+You can save the script above to a file (*eg*.``~/notify.py``), then make it
+executable and run:
+
+::
+
+    chmod +x notify.py
+    ./notify.py
+
+Then while it is running,  try to send a notification to the device (or all
+the devices) via `Pushover website`_ or other notification sending app.
+
 
 Command line tool
 -----------------
@@ -150,3 +203,4 @@ This project has been set up using PyScaffold 4.1.4. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
 
 .. _Pushover Open Client API documentation: https://pushover.net/api/client
+.. _Pushover website: https://pushover.net
