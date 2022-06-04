@@ -15,6 +15,8 @@ import sys
 import types
 # import typing
 
+from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+
 import websocket
 
 FUNCTION = types.FunctionType
@@ -24,12 +26,12 @@ DEBUG: bool = False
 if DEBUG:
     websocket.enableTrace(True)
 
-from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+# from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
 
-#if sys.version_info[:2] >= (3, 8):
+# if sys.version_info[:2] >= (3, 8):
 #    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
 #    from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
-#else:
+# else:
 #    from importlib_metadata import PackageNotFoundError, version  # pragma: no cover
 
 try:
@@ -289,8 +291,8 @@ class PushoverOpenClient:
 
     email: str = str()
     password: str = str()
-    device_id:str = str()
-    secret:str = str()
+    device_id: str = str()
+    secret: str = str()
 
     twofa: str = None  # two-factor authentication
     """str: Two-factor authentication code.
@@ -308,6 +310,8 @@ class PushoverOpenClient:
 
     messages: dict[int, dict] = dict()  # { message_id: {message_dict...}, }
 
+    highest_message_id: int | None = None
+
     login_response: requests.Response | None = None
     login_response_data: dict | None = dict()
     login_errors: list[str] | dict[list] | None = None
@@ -317,7 +321,7 @@ class PushoverOpenClient:
     device_registration_errors: list[str] | dict[list] | None = None
 
     message_downloading_response: requests.Response | None = None
-    message_downloading_response_data: dict | None= dict()
+    message_downloading_response_data: dict | None = dict()
     message_downloading_errors: list[str] | dict[list] | None = None
 
     update_highest_message_response: requests.Response | None = None
@@ -369,7 +373,7 @@ class PushoverOpenClient:
 
         return self
 
-    def load_from_credentials_file(self, file_path: str =\
+    def load_from_credentials_file(self, file_path: str =
                                    CREDENTIALS_FILENAME) -> object:
         """Loads class through credentials file.
 
@@ -383,7 +387,7 @@ class PushoverOpenClient:
 
         if not os.path.isfile(file_path):
             raise Exception("Credentials file '{credentials_file_path}'"
-                            " not found. Please create."\
+                            " not found. Please create."
                             .format(credentials_file_path=file_path))
 
         with open(file_path, "r") as credentials_file:
@@ -439,8 +443,10 @@ class PushoverOpenClient:
             if not twofa and not self.twofa:
                 return None
                 # return False
-            if twofa: twofa = twofa
-            elif self.needs_twofa: twofa = self.twofa
+            if twofa:
+                twofa = twofa
+            elif self.needs_twofa:
+                twofa = self.twofa
 
         self.login_response = None
         self.login_response_data = None
@@ -526,7 +532,7 @@ class PushoverOpenClient:
 
         self.device_registration_response = device_registration_response
         self.device_registration_response_data =\
-                 device_registration_response_dict
+            device_registration_response_dict
 
         if not device_registration_response_dict["status"] == 1:
             self.device_registration_errors =\
@@ -627,7 +633,7 @@ class PushoverOpenClient:
 
         update_highest_message_endpoint =\
             ENDPOINT_UPDATE_HIGHEST_MESSAGE.format(api_url=PUSHOVER_API_URL,
-                                                   device_id=self.device_id)
+                                                   device_id=device_id)
 
         update_highest_message_response =\
             requests.post(update_highest_message_endpoint,
@@ -637,7 +643,7 @@ class PushoverOpenClient:
             json.loads(update_highest_message_response.text)
 
         self.update_highest_message_response = update_highest_message_response
-        self.update_highest_message_data = update_highest_message_dict
+        self.update_highest_message_response_data = update_highest_message_dict
 
         if not update_highest_message_dict["status"] == 1:
             self.update_highest_message_errors =\
@@ -708,11 +714,14 @@ class PushoverOpenClient:
     def _get_credentials_dict(self) -> dict:
         credentials_dict = dict()
 
-        if self.email: credentials_dict.update({"email": self.email})
-        if self.password: credentials_dict.update({"password": self.password})
-        if self.secret: credentials_dict.update({"secret": self.secret})
-        if self.device_id: credentials_dict.update({"device_id":
-                                                        self.device_id})
+        if self.email:
+            credentials_dict.update({"email": self.email})
+        if self.password:
+            credentials_dict.update({"password": self.password})
+        if self.secret:
+            credentials_dict.update({"secret": self.secret})
+        if self.device_id:
+            credentials_dict.update({"device_id": self.device_id})
 
         return credentials_dict
 
@@ -782,13 +791,13 @@ class PushoverOpenClientRealTime:
         self.pushover_open_client = pushover_open_client
 
         self.pushover_websocket_server_commands =\
-        {
-            b'#': self.message_keep_alive,
-            b'!': self.message_do_sync,
-            b'R': self.message_reload_request,
-            b'E': self.message_error_permanent,
-            b'A': self.message_error
-        }
+            {
+                b'#': self.message_keep_alive,
+                b'!': self.message_do_sync,
+                b'R': self.message_reload_request,
+                b'E': self.message_error_permanent,
+                b'A': self.message_error
+            }
 
         self.pushover_websocket_login_string =\
             pushover_open_client.get_websocket_login_string()
@@ -865,52 +874,67 @@ class PushoverOpenClientRealTime:
         """
         pass
 
-    def process_function_command(self, message):
-        pass
+    def process_command_function(self, raw_data) -> None:
+        arguments = raw_data["message"].split()
+        command = arguments[0]
 
-    def process_parser_command(self, message):
-        pass
+        COMMAND_FUNCTIONS_REGISTRY[command](*arguments, raw_data=raw_data)
 
-    def process_parser(self, message):
-        pass
+    def process_parser_command(self, raw_data) -> None:
+        arguments = raw_data["message"].split()
+        command = arguments[0]
 
-    def process_shell_command(self, message):
-        pass
+        COMMAND_PARSERS_REGISTRY[command](raw_data)
 
-    def process_shell_alias(self, message):
-        pass
+    def process_parser(self, raw_data) -> None:
+        for parser in PARSERS_REGISTRY:
+
+            PARSERS_REGISTRY[parser](raw_data)
+
+    def process_shell_command(self, raw_data) -> None:
+        arguments_str = raw_data["message"]
+
+        subprocess.Popen(args=arguments_str, shell=True)
+
+    def process_shell_alias(self, raw_data) -> None:
+        alias = raw_data["message"].split()[0]  # first word
+        command_line_str = SHELL_COMMAND_ALIASES_REGISTRY[alias]
+
+        subprocess.Popen(args=command_line_str, shell=True)
 
     def process_message(self, message: dict) -> None:
+        """Processes each new notification received.
+
+        Args:
+            message (dict): newly received notification message raw data.
+
+        Returns:
+            None
+        """
 
         raw_data = get_notification_model(**message)
-        print(raw_data)
 
         # TODO: PLEASE USE `shlex` HERE
         arguments = raw_data["message"].split()
-        arguments_str = " ".join(arguments)  # useful for Popen with shell=True
         first_word = arguments[0]
 
-        command = first_word
-        alias = first_word
+        command, alias = first_word, first_word
 
         if command in COMMAND_FUNCTIONS_REGISTRY:
-            COMMAND_FUNCTIONS_REGISTRY[command](*arguments, raw_data=message)
+            self.process_command_function(raw_data=raw_data)
 
         if command in COMMAND_PARSERS_REGISTRY:
-            COMMAND_PARSERS_REGISTRY[command](message)
+            self.process_parser_command(raw_data=raw_data)
 
         if command in SHELL_COMMANDS_REGISTRY:
-            subprocess.Popen(args=arguments_str, shell=True)
+            self.process_shell_command(raw_data=raw_data)
 
         if alias in SHELL_COMMAND_ALIASES_REGISTRY:
-            command_str = SHELL_COMMAND_ALIASES_REGISTRY[alias]
+            self.process_shell_alias(raw_data=raw_data)
 
-            subprocess.Popen(args=command_str, shell=True)
-
-        # these are executed for all notifications
-        for parser in PARSERS_REGISTRY:
-            print("PARSERS_REGISTRY", PARSERS_REGISTRY)
-            PARSERS_REGISTRY[parser](message)
+        # these are executed for all notifications so we don't have anything
+        # to check
+        self.process_parser(raw_data=raw_data)
 
         if "title" in message:
             print("TITLE:  ", message["title"])
@@ -1057,4 +1081,3 @@ class PushoverOpenClientRealTime:
     def _on_close(self, websocketapp: websocket.WebSocketApp,
                   close_status_code: int | str, close_msg: str) -> None:
         pass
-
