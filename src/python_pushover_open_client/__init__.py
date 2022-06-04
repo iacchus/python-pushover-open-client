@@ -8,6 +8,7 @@ import functools
 import json
 import os
 import requests
+import shutil
 import subprocess
 import sys
 import types
@@ -22,11 +23,13 @@ DEBUG: bool = False
 if DEBUG:
     websocket.enableTrace(True)
 
-if sys.version_info[:2] >= (3, 8):
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
-    from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
-else:
-    from importlib_metadata import PackageNotFoundError, version  # pragma: no cover
+from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+
+#if sys.version_info[:2] >= (3, 8):
+#    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
+#    from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+#else:
+#    from importlib_metadata import PackageNotFoundError, version  # pragma: no cover
 
 try:
     # Change here if project is renamed and does not equal the package name
@@ -981,7 +984,8 @@ class PushoverOpenClientRealTime:
 
         This method is executed when the server sends a message consisting of
         `b'E'`. When this error is received, we should not connect again;
-        instead, do login again and reenable the device.
+        user should and reenable the device if disable, else, we should create
+        another device..
 
         Returns:
             None
