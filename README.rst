@@ -206,8 +206,8 @@ Note
 
 This project has been set up using PyScaffold 4.1.4. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
-.. __init__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__init__.py
-.. __main__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__main__.py
+.. ___init__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__init__.py
+.. ___main__.py: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__main__.py
 .. _installed the package: https://github.com/iacchus/python-pushover-open-client#installing
 .. _entered your Pushover credentials: https://github.com/iacchus/python-pushover-open-client#setting-up
 .. _Pushover Open Client API documentation: https://pushover.net/api/client
