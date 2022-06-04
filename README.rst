@@ -103,7 +103,7 @@ will be added soon, as there are more decorators/functions to be used.
 file: ``notify.py``
 ~~~~~~~~~~~~~~~~~~~
 
-::
+.. code:: python
 
     #!/usr/bin/env python
 
@@ -143,7 +143,7 @@ file: ``notify.py``
 You can save the script above to a file (*eg*.``~/notify.py``), then make it
 executable and run:
 
-::
+.. code:: sh
 
     chmod +x notify.py
     ./notify.py
