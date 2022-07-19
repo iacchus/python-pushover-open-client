@@ -950,7 +950,7 @@ class PushoverOpenClientRealTime:
             None
         """
 
-        print(messages)  # TODO: fixme!!
+        #print(messages)  # TODO: fixme!!
 
         for message in messages:
             self.process_message(message)
