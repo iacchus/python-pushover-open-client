@@ -94,6 +94,19 @@ these four values.
 Using
 =====
 
+Command line
+------------
+
+Our command line ``pushover-open-client`` still needs more functions,
+but we already have one. `His whole interface is here`_.
+
+.. code:: sh
+
+    pushover-open-client json
+
+This command outputs new received notifications and can be used to pipe for
+your own scripts to be processed.
+
 Programatically
 ---------------
 
@@ -154,12 +167,15 @@ the devices) via `Pushover website`_ or other notification sending app.
 Full featured Pushover client using this lib
 ============================================
 
-Send notification to desktop (if you use `notify-send`) and show the
+Send notification to desktop (if you use ``notify-send``) and show the
 notification on the terminal executing it. Only lacks the Pushover App icon.
 
 You can even create a systemd service to always receive the notifications on
 desktop automatically. (In this case, you can delete the terminal printing
 lines.)
+
+file: ``python-client.py``
+--------------------------
 
 .. code:: python
 
@@ -171,7 +187,7 @@ lines.)
     from python_pushover_open_client import PushoverOpenClientRealTime
 
 
-    PERMANENT_NOTIFICATION = False  # should notifications stay until clicked?
+    PERMANENT_NOTIFICATION = True  # should notifications stay until clicked?
 
     # shows notifications on Desktop using `notify-send`
 
@@ -180,11 +196,11 @@ lines.)
         """Executes notify-send to notify for new notifications."""
 
         message = raw_data['message']
-        title = raw_data['title']
+        title = raw_data['title'] if raw_data['title'] else '_'
 
-        is_permanent = "-t 0" if PERMANENT_NOTIFICATION else ""
+        is_permanent = ["-t", "0"] if PERMANENT_NOTIFICATION else []
 
-        args = ['notify-send', is_permanent, message, title ]
+        args = ['notify-send', *is_permanent, title, message ]
 
         Popen(args=args)
 
@@ -194,12 +210,14 @@ lines.)
     def my_terminal_output_parser(raw_data=None):
         """Outputs the notification to the terminal."""
 
+        print(raw_data)
+
         message = raw_data['message']
-        title = raw_data['title']
+        title = raw_data['title'] if raw_data['title'] else '_'
 
         print(f"{title}\n{message}", end="\n\n")
 
-    # instantiates the Pushover websocket class and runs it
+    # this instantiates the Pushover websocket class and runs it:
 
     client = PushoverOpenClientRealTime()
     client.run_forever()
@@ -260,6 +278,7 @@ Note
 This project has been set up using PyScaffold 4.1.4. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
 
+.. _His whole interface is here: https://github.com/iacchus/python-pushover-open-client/blob/main/src/python_pushover_open_client/__main__.py
 .. _installed the package: https://github.com/iacchus/python-pushover-open-client#installing
 .. _entered your Pushover credentials: https://github.com/iacchus/python-pushover-open-client#setting-up
 .. _Pushover Open Client API documentation: https://pushover.net/api/client
