@@ -151,6 +151,59 @@ executable and run, after you have `installed the package`_  and `entered your P
 Then while it is running,  try to send a notification to the device (or all
 the devices) via `Pushover website`_ or other notification sending app.
 
+Full featured Pushover client using this lib
+============================================
+
+Send notification to desktop (if you use `notify-send`) and show the
+notification on the terminal executing it. Only lacks the Pushover App icon.
+
+You can even create a systemd service to always receive the notifications on
+desktop automatically. (In this case, you can delete the terminal printing
+lines.)
+
+.. code:: python
+
+    #!/usr/bin/env python
+
+    from subprocess import Popen
+
+    from python_pushover_open_client import register_parser
+    from python_pushover_open_client import PushoverOpenClientRealTime
+
+
+    PERMANENT_NOTIFICATION = False  # should notifications stay until clicked?
+
+    # shows notifications on Desktop using `notify-send`
+
+    @register_parser
+    def my_notify_send_parser(raw_data=None):
+        """Executes notify-send to notify for new notifications."""
+
+        message = raw_data['message']
+        title = raw_data['title']
+
+        is_permanent = "-t 0" if PERMANENT_NOTIFICATION else ""
+
+        args = ['notify-send', is_permanent, message, title ]
+
+        Popen(args=args)
+
+    # prints to the terminal
+
+    @register_parser
+    def my_terminal_output_parser(raw_data=None):
+        """Outputs the notification to the terminal."""
+
+        message = raw_data['message']
+        title = raw_data['title']
+
+        print(f"{title}\n{message}", end="\n\n")
+
+    # instantiates the Pushover websocket class and runs it
+
+    client = PushoverOpenClientRealTime()
+    client.run_forever()
+
 
 Command line tool
 -----------------
