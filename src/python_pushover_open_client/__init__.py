@@ -936,13 +936,6 @@ class PushoverOpenClientRealTime:
         # to check
         self.process_parser(raw_data=raw_data)
 
-        if "title" in message:
-            print("TITLE:  ", message["title"])
-
-        print("MESSAGE:", message["message"])
-
-        if "url" in message:
-            print("URL:    ", message["url"])
 
     def process_message_list(self, messages: list[dict]) -> None:
         """Process a list of notifications.
